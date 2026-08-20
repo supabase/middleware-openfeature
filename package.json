@@ -38,6 +38,7 @@
   "packageManager": "pnpm@11.9.0",
   "scripts": {
     "build": "tsdown",
+    "smoke:deno": "pnpm build && deno run --allow-env --allow-net --allow-read --allow-sys --allow-ffi --config smoke/deno/deno.json smoke/deno/main.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "typecheck:negative": "node scripts/check-negative-types.mjs",
