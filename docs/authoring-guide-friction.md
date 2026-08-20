@@ -125,5 +125,40 @@ either nest under the contributing middleware or spread your keys onto
 `seedContext()`; a plain object in the `ctx` position is treated as the host's
 platform argument."
 
-<!-- Entries F7+ are added by later tasks: F7 bespoke generic signature (Task 5),
-     F8 must-not-compile tests (Task 6), F9 CI and release (Task 9). -->
+## F7 — the bespoke generic signature has no worked example anywhere
+
+**Guide:** never mentions bespoke signatures. The only sanction for them is a
+paragraph inside `NoConflict`'s TSDoc in `src/core/define-middleware.ts`, which
+an author following the guide has no reason to open.
+
+**Reality:** any middleware needing a type parameter beyond `defineMiddleware`'s
+four must hand-write its own overload set and get three separate things right:
+
+1. **`NoInfer` on the handler parameter, and nowhere else.** Verified here by
+   experiment: moving it onto `config` in the config-only overload breaks the
+   `pipeline` form with
+
+   ```
+   TS2322: Type '(_r: Request, ctx: { jwtClaims: JWTClaims | null; }) => …' is not
+   assignable to type '(req: Request, ctx: object) => EvaluationContext'.
+   ```
+
+   An explicit param annotation is the sole channel by which the accumulated
+   context can be supplied in that form, and `NoInfer` closes it.
+
+2. **`NoConflict` on every overload that can accept a handler.** The docblock
+   says so; the design's own sketch omitted it. Adding it back was verified not
+   to disturb the inward cascade — all five positive cases still compile.
+3. **Overload order** — cascade before config-only.
+
+The design for this package got `NoInfer` wrong twice while being written, once
+in a way that **compiled clean and silently dropped typing**. Nothing in the
+guide would have caught that.
+
+**Would have helped:** a guide section walking one bespoke signature end to end,
+with those three rules stated. This package is the natural worked example, and
+its type tests — positive plus the message-asserted must-NOT-compile cases —
+could serve as the guide's regression suite (design §9.3, ask E2).
+
+<!-- Entries F8+ are added by later tasks: F8 must-not-compile tests (Task 6),
+     F9 CI and release (Task 9). -->

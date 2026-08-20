@@ -26,3 +26,81 @@ const _a4b: Resolved<{ theme: 'light'; maxItems: 10 }> = {
   maxItems: anyNumber,
 }
 void _a4b
+
+import { pipeline } from '@supabase/middleware'
+import type { FetchHandler } from '@supabase/middleware'
+
+import { withOpenFeature } from '../src/index.js'
+import { client, withClaims } from './fixtures.js'
+import type { JWTClaims } from './fixtures.js'
+
+// A1 — nesting form: the config callback's `ctx` is typed against the upstream
+// with no annotation, and the handler sees both upstream and contribution.
+withClaims(
+  withOpenFeature(
+    {
+      client,
+      flags: { betaCheckout: false, theme: 'light' },
+      context: (_r, ctx) => ({ targetingKey: ctx.jwtClaims?.sub ?? 'anon' }),
+    },
+    async (_req, ctx) => {
+      const _b: boolean = ctx.flags.betaCheckout
+      const _t: string = ctx.flags.theme
+      const _s: string | undefined = ctx.jwtClaims?.sub
+      return Response.json({ _b, _t, _s })
+    },
+  ),
+) satisfies FetchHandler
+
+// A2 — pipeline form, config callback reading upstream. The one-line param
+// annotation is the documented workaround for the evaluation-order limit in
+// design §2.5; without it this is A7, which must NOT compile.
+pipeline(
+  [
+    withClaims(),
+    withOpenFeature({
+      client,
+      flags: { a: false },
+      context: (_r, ctx: { jwtClaims: JWTClaims | null }) => ({
+        targetingKey: ctx.jwtClaims?.sub ?? 'anon',
+      }),
+    }),
+  ],
+  async (_req, ctx) => Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
+
+// A8 — pipeline composition types normally: the handler sees every upstream key
+// AND the contribution, at full fidelity. This is what proves design §2.5's
+// limit is scoped to the config callback and is not a `pipeline` defect.
+pipeline(
+  [
+    withClaims(),
+    withOpenFeature({ client, flags: { betaCheckout: false, theme: 'light' } }),
+  ],
+  async (_req, ctx) => {
+    const _b: boolean = ctx.flags.betaCheckout
+    const _t: string = ctx.flags.theme
+    const _s: string | undefined = ctx.jwtClaims?.sub
+    return Response.json({ _b, _t, _s })
+  },
+) satisfies FetchHandler
+
+// A9 — pipeline form with a config callback that ignores upstream ctx: no
+// annotation needed. The cost in A2 is narrow, and this is the proof.
+pipeline(
+  [
+    withClaims(),
+    withOpenFeature({
+      client,
+      flags: { a: false },
+      context: (req) => ({ targetingKey: req.headers.get('x-user') ?? 'anon' }),
+    }),
+  ],
+  async (_req, ctx) => Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
+
+// A12 — standalone, no upstream: the produced stack is a `fetch` export on its
+// own, because `In` is empty and `ctx` is therefore optional.
+withOpenFeature({ client, flags: { a: false } }, async (_req, ctx) =>
+  Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
