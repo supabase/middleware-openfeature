@@ -241,4 +241,45 @@ guide shows and fails on the first consumer who composes it unanchored.
 you need all three of the engine's overloads, not the two you will reach for. The
 propagation form covers the wrapped handler's prerequisites, not your own."
 
-<!-- Entry F10 is added by Task 9: CI and release. -->
+## F10 — no release or CI guidance at all
+
+**Guide:** §4 ends at `package.json`.
+
+**Reality:** a publishable package also needs a CI workflow, a release
+mechanism, and a decision about the TypeScript floor check. All of it was
+recovered by copying the engine's `.github/workflows/` and
+`release-please-config.json`. An author outside the org has no such reference.
+
+The consumer-floor check is the one nobody would think to add on their own, and
+it is the one that matters most: it is the only thing standing between a
+`NoInfer` in an exported signature and a consumer on TypeScript 5.3 getting an
+unreadable error from a package that advertises no floor at all.
+
+**Would have helped:** a §6 pointing at the engine's workflows as a template, or
+a minimal CI snippet in the guide itself — typecheck, test, build, and the
+consumer-floor check.
+
+## F11 — the guide's own Rule 7 is not mechanically checkable as written
+
+**Guide:** Rule 7 — "NEVER import from `node:*`."
+
+**Reality:** the obvious CI check for it, `grep -rn "node:" src/`, **fails on a
+clean tree**. This package's `src/types.ts` explains in a doc comment why it
+avoids `@openfeature/server-sdk`'s `node:events` — so documenting compliance with
+Rule 7 trips the naive check for Rule 7. The working form has to match import
+specifiers:
+
+```bash
+grep -rnE "(from|import|require)\s*\(?\s*['\"]node:" src/
+```
+
+Verified both ways here: the naive form reports a violation on a clean tree, and
+the form above does not, while still catching a real
+`import { EventEmitter } from 'node:events'`.
+
+Related: this is only a check of the package's **own source**. Whether Rule 7 is
+meant to constrain the dependency tree too is the open question in design §9.2 /
+ask E1 — and no grep can answer that one.
+
+**Would have helped:** the guide shipping the specifier-matching grep as the
+canonical Rule 7 check, so every author does not write the broken one first.
