@@ -1,0 +1,65 @@
+{
+  "name": "@supabase/middleware-openfeature",
+  "version": "0.1.0",
+  "description": "Typed OpenFeature flag resolution as a @supabase/middleware middleware. Resolves every declared flag per request and contributes the values at ctx.flags.",
+  "keywords": [
+    "middleware",
+    "fetch",
+    "edge",
+    "supabase",
+    "openfeature",
+    "feature-flags"
+  ],
+  "homepage": "https://github.com/supabase/middleware-openfeature#readme",
+  "bugs": {
+    "url": "https://github.com/supabase/middleware-openfeature/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supabase/middleware-openfeature.git"
+  },
+  "license": "MIT",
+  "author": "supabase",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@openfeature/core": "^1.12.0",
+    "@supabase/middleware": "^0.3.0"
+  },
+  "devDependencies": {
+    "@openfeature/server-sdk": "^1.23.0",
+    "prettier": "3.8.1",
+    "tsdown": "^0.20.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.4"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  }
+}
