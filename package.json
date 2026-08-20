@@ -39,6 +39,8 @@
   "scripts": {
     "build": "tsdown",
     "smoke:deno": "pnpm build && deno run --allow-env --allow-net --allow-read --allow-sys --allow-ffi --config smoke/deno/deno.json smoke/deno/main.ts",
+    "smoke:edge:vendor": "pnpm build && bash smoke/edge/vendor.sh",
+    "smoke:edge": "pnpm smoke:edge:vendor && vitest run --config smoke/edge/vitest.config.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "typecheck:negative": "node scripts/check-negative-types.mjs",
@@ -53,6 +55,7 @@
   "devDependencies": {
     "@openfeature/server-sdk": "^1.23.0",
     "prettier": "3.8.1",
+    "supabase": "^2.114.0",
     "tsdown": "^0.20.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"

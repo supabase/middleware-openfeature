@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "@supabase/middleware-openfeature": "../_vendor/package/dist/index.js",
+    "@supabase/middleware": "npm:@supabase/middleware@0.3.0",
+    "@openfeature/core": "npm:@openfeature/core@1.12.0",
+    "@openfeature/server-sdk": "npm:@openfeature/server-sdk@1.18.0",
+    "@vercel/flags-core/openfeature": "npm:@vercel/flags-core@1.7.1/openfeature"
+  }
+}

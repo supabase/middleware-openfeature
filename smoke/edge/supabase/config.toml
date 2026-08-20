@@ -1,0 +1,44 @@
+# Local Supabase stack for the OpenFeature edge smoke test. Ports are offset
+# from the CLI defaults (54321…) and from @supabase/server's e2e stack (54331…)
+# so all three can run side by side.
+project_id = "middleware-openfeature-smoke"
+
+[api]
+enabled = true
+port = 54341
+
+[db]
+port = 54342
+shadow_port = 54340
+major_version = 17
+
+[db.seed]
+enabled = false
+
+# Only the gateway and the edge runtime are needed. Everything else is off to
+# keep `supabase start` fast.
+[realtime]
+enabled = false
+
+[studio]
+enabled = false
+
+[inbucket]
+enabled = false
+
+[storage]
+enabled = false
+
+[analytics]
+enabled = false
+
+[auth]
+enabled = false
+
+[edge_runtime]
+enabled = true
+
+# The smoke function answers unauthenticated — the gateway's JWT pre-check must
+# not answer first.
+[functions.openfeature-smoke]
+verify_jwt = false

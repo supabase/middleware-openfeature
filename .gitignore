@@ -11,3 +11,6 @@ dist/
 # are tracked — see docs/authoring-guide-friction.md and
 # docs/deno-vercel-findings.md.
 docs/superpowers/
+
+# Vendored copy of this package, rebuilt by smoke/edge/vendor.sh
+smoke/edge/supabase/functions/_vendor/
