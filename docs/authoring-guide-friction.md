@@ -10,6 +10,23 @@ Format: what the guide says → what actually happened → what would have helpe
 (`docs/authoring-guide.md` in `supabase/middleware`), not of this file or of the
 design document.
 
+## Where each finding was filed
+
+All eleven were filed against `supabase/middleware` on 2026-08-20, as five
+issues in Triage on the SDK team.
+
+| Finding                                       | Issue                                                                         |
+| --------------------------------------------- | ----------------------------------------------------------------------------- |
+| F1, F2, F3, F4, F6, F10                       | SDK-1543 — remaining gaps in sections 3 and 4                                 |
+| F5                                            | SDK-1542 — the section 4 `exports` block points at files tsdown does not emit |
+| F7, F8, F9                                    | SDK-1540 — add a full example of a hand-written generic signature             |
+| F11                                           | SDK-1539 — decide what Rule 7 covers                                          |
+| _(the `pipeline` config-callback annotation)_ | SDK-1541                                                                      |
+
+None of them need a change to the engine's runtime code. Nine are edits to
+`docs/authoring-guide.md`, one corrects a comment in `src/core/types.ts`, and one
+is a pointer from the guide to docs that already exist in `src/core/runtime.ts`.
+
 ## F1 — section 4's `package.json` is ESM-only; the engine ships dual
 
 **Guide:** section 4's example declares a single `exports` condition pair
