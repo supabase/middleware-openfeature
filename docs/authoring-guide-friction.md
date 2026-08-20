@@ -85,5 +85,45 @@ of the guide's own example disagree. This is the single highest-value fix in
 this log: it is silent, it hits every author on their first build, and it is one
 line.
 
-<!-- Entries F6+ are added by later tasks: F6 bespoke generic signature (Task 5),
-     F7 must-not-compile tests (Task 6), F8 CI and release (Task 9). -->
+## F6 — §3's test recipe has no way to supply an upstream context
+
+**Guide:** §3 shows a middleware tested by calling the composed handler with a
+`Request` — `await handler(post({ name: 'ada' }))` — and says "no test harness
+is needed. A composed middleware is just a `(req, ctx?) => Promise<Response>`,
+so you call it with a `Request` and assert on the `Response`."
+
+**Reality:** true only for a middleware that ignores upstream context. This one
+takes a `context` callback that reads upstream keys (design §6), and the obvious
+way to test it — pass the context positionally, which the published signature
+openly invites — **silently does not work**:
+
+```ts
+await handler(req, { jwtClaims: { sub: 'user-1' } }) // callback sees {} instead
+```
+
+`isContext` looks for a `Symbol.for` marker that only `seedContext` sets. An
+unmarked object in that slot is read as the _host platform argument_ (a Workers
+`env`, a Deno `ServeHandlerInfo`) and — worse than being ignored — is captured
+as the module-scoped `platformEnv` that `getEnv` reads, while a fresh empty
+context is seeded for the stack. No error, no warning; the assertion just fails
+somewhere unrelated.
+
+This is documented, but in the TSDoc of `seedContext`/`isContext` in
+`src/core/runtime.ts` and in a parenthetical on `BaseContext` — none of which an
+author following the guide has reason to open. Cost here: one debugging cycle on
+a test that looked correct.
+
+The two forms that _do_ work are now pinned as tests in
+`src/with-open-feature.test.ts`:
+
+- compose under a real upstream middleware (the production path)
+- `{ ...seedContext(), jwtClaims: … }` — the mint path `seedContext`'s docstring
+  sanctions for hosts embedding the engine
+
+**Would have helped:** two lines in §3 — "to test against an upstream context,
+either nest under the contributing middleware or spread your keys onto
+`seedContext()`; a plain object in the `ctx` position is treated as the host's
+platform argument."
+
+<!-- Entries F7+ are added by later tasks: F7 bespoke generic signature (Task 5),
+     F8 must-not-compile tests (Task 6), F9 CI and release (Task 9). -->
