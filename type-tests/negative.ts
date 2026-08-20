@@ -1,0 +1,84 @@
+/**
+ * Cases that MUST NOT compile.
+ *
+ * Excluded from `tsconfig.json` on purpose — `pnpm typecheck` would fail on it.
+ * `pnpm typecheck:negative` compiles this file with the config next door and
+ * asserts each `@expect-error` marker below is matched by a real diagnostic,
+ * and that no unexpected diagnostic appears.
+ *
+ * Marker format: `// @expect-error <TSCODE> <substring of the message>`
+ */
+
+import { pipeline } from '@supabase/middleware'
+import type { FetchHandler } from '@supabase/middleware'
+
+import { withOpenFeature } from '../src/index.js'
+import { client, withClaims } from './fixtures.js'
+
+// A5 — proves the nesting form's `ctx` is genuinely typed and not silently
+// `any`. A bogus key must be rejected, and the message must print the real
+// accumulated type (design §2.5).
+// @expect-error TS2339 Property 'nope' does not exist on type
+withClaims(
+  withOpenFeature(
+    {
+      client,
+      flags: { a: false },
+      context: (_r, ctx) => ({ targetingKey: ctx.nope }),
+    },
+    async () => new Response(),
+  ),
+) satisfies FetchHandler
+
+// A6 — `jwtClaims` is `| null`, so an unguarded `.sub` must be rejected. This
+// is the second half of proving the nesting form's typing is real.
+// @expect-error TS18047 is possibly 'null'
+withClaims(
+  withOpenFeature(
+    {
+      client,
+      flags: { a: false },
+      context: (_r, ctx) => ({ targetingKey: ctx.jwtClaims.sub }),
+    },
+    async () => new Response(),
+  ),
+) satisfies FetchHandler
+
+// A7 — pipeline form, config callback reads upstream WITHOUT the annotation.
+// This is design §2.5's limit, pinned as a test so the documentation and the
+// compiler cannot drift apart. NOTE: only the callback fails — the handler in
+// this same expression types fine, which is what A8 in positive.ts proves.
+// @expect-error TS2339 Property 'jwtClaims' does not exist on type 'object'
+pipeline(
+  [
+    withClaims(),
+    withOpenFeature({
+      client,
+      flags: { a: false },
+      context: (_r, ctx) => ({ targetingKey: ctx.jwtClaims?.sub }),
+    }),
+  ],
+  async (_req, ctx) => Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
+
+// A10 — a bogus key in the pipeline HANDLER must error, printing the full
+// accumulated type. This is what proves A8's typing is real accumulation and
+// not `any`.
+// @expect-error TS2339 Property 'nope' does not exist on type
+pipeline(
+  [withClaims(), withOpenFeature({ client, flags: { a: false } })],
+  async (_req, ctx) => Response.json({ nope: ctx.nope }),
+) satisfies FetchHandler
+
+// A11 — a key collision must be reported against THIS call, naming the key.
+// `NoConflict` on the handler parameter is what makes the message readable.
+// Reported as TS2345, not TS2769: this bespoke interface has only ONE
+// handler-accepting signature, so the mismatch is a plain argument error rather
+// than an overload-set failure. The engine's own `Middleware` has two and does
+// report TS2769. Either way the sentinel text reaches the reader and names the
+// colliding key, which is the point of siting it on the parameter.
+// @expect-error TS2345 middleware-conflict: key 'flags' is already present on the upstream context
+withOpenFeature(
+  { client, flags: { a: false } },
+  withOpenFeature({ client, flags: { b: false } }, async () => new Response()),
+) satisfies FetchHandler

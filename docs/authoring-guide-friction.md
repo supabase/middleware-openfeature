@@ -160,5 +160,42 @@ with those three rules stated. This package is the natural worked example, and
 its type tests — positive plus the message-asserted must-NOT-compile cases —
 could serve as the guide's regression suite (design §9.3, ask E2).
 
-<!-- Entries F8+ are added by later tasks: F8 must-not-compile tests (Task 6),
-     F9 CI and release (Task 9). -->
+## F8 — no pattern for must-not-compile tests
+
+**Guide:** §3's only type-level assertion is an inline `satisfies FetchHandler`
+in a runtime test file.
+
+**Reality:** a middleware whose contract is mostly type-level needs cases that
+must _fail_ to compile, and those cannot live in a file `tsc --noEmit` checks.
+They need a second tsconfig and a separate script.
+
+They also need assertions on the error **message**, not just its presence.
+`@ts-expect-error` would have passed all five cases here while proving almost
+nothing: three of them exist specifically to show a `ctx` is typed rather than
+silently `any`, and only the message distinguishes that from "rejected for an
+unrelated reason". The messages this repo now pins:
+
+| Case | Asserted message                                                                                                            |
+| ---- | --------------------------------------------------------------------------------------------------------------------------- |
+| A5   | `Property 'nope' does not exist on type 'object & { jwtClaims: JWTClaims \| null; }'`                                       |
+| A6   | `'ctx.jwtClaims' is possibly 'null'`                                                                                        |
+| A7   | `Property 'jwtClaims' does not exist on type 'object'`                                                                      |
+| A10  | `Property 'nope' does not exist on type 'object & { jwtClaims: JWTClaims \| null; } & { flags: Resolved<{ a: false; }>; }'` |
+| A11  | `middleware-conflict: key 'flags' is already present on the upstream context`                                               |
+
+A10's is the interesting one: the full accumulated type printed in the error is
+the only direct evidence that `pipeline`'s handler `ctx` is real accumulation.
+
+**One discovery worth carrying into the guide.** `Conflict`'s docblock states the
+sentinel surfaces as **TS2769**, "with the sentinel on the first line of the
+per-overload breakdown". That is true of the engine's own `Middleware`, which has
+two handler-accepting overloads. A bespoke interface with only _one_ such
+signature gets **TS2345** instead — a plain argument mismatch. The sentinel text
+still reaches the reader and still names the key, so the design intent holds, but
+an author asserting on the code will pick the wrong one from the docblock.
+
+**Would have helped:** the guide shipping the `type-tests/` + marker-comment +
+harness pattern this package now has, and `Conflict`'s docblock noting that the
+diagnostic code depends on how many overloads can accept a handler.
+
+<!-- Entry F9 is added by Task 9: CI and release. -->

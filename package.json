@@ -40,6 +40,7 @@
     "build": "tsdown",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
+    "typecheck:negative": "node scripts/check-negative-types.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
