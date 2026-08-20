@@ -1,0 +1,4 @@
+# Supabase CLI local-stack artifacts
+.branches
+.temp
+.env
