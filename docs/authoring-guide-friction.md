@@ -186,16 +186,59 @@ unrelated reason". The messages this repo now pins:
 A10's is the interesting one: the full accumulated type printed in the error is
 the only direct evidence that `pipeline`'s handler `ctx` is real accumulation.
 
-**One discovery worth carrying into the guide.** `Conflict`'s docblock states the
-sentinel surfaces as **TS2769**, "with the sentinel on the first line of the
-per-overload breakdown". That is true of the engine's own `Middleware`, which has
-two handler-accepting overloads. A bespoke interface with only _one_ such
-signature gets **TS2345** instead — a plain argument mismatch. The sentinel text
-still reaches the reader and still names the key, so the design intent holds, but
-an author asserting on the code will pick the wrong one from the docblock.
+**One discovery worth carrying into the guide, observed live.** `Conflict`'s
+docblock states the sentinel surfaces as **TS2769**, "with the sentinel on the
+first line of the per-overload breakdown". That holds only once **two or more**
+signatures can accept a handler. This package watched the code change under it:
+
+| Interface shape                                                      | Collision diagnostic                                                                 |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| cascade + config-only (2 signatures, 1 takes a handler)              | **TS2345** — plain argument mismatch, sentinel on the top-level line                 |
+| cascade + propagation + config-only (3 signatures, 2 take a handler) | **TS2769** — "No overload matches this call", sentinel in the per-overload breakdown |
+
+Adding the propagation overload (see F9) flipped it. Two consequences for anyone
+writing a negative type test against a bespoke signature:
+
+1. Asserting on the diagnostic **code** is fragile — it is a function of the
+   overload set's shape, not of the error.
+2. A harness that parses only top-level `file(line,col): error TSxxxx: message`
+   lines **cannot see the sentinel at all** under TS2769, because the useful text
+   is in the indented breakdown. This one had to be taught to fold continuation
+   lines into the preceding diagnostic before A11 could assert on the sentinel.
 
 **Would have helped:** the guide shipping the `type-tests/` + marker-comment +
 harness pattern this package now has, and `Conflict`'s docblock noting that the
-diagnostic code depends on how many overloads can accept a handler.
+diagnostic code depends on how many signatures can accept a handler — and that
+the sentinel moves into the breakdown when it does.
 
-<!-- Entry F9 is added by Task 9: CI and release. -->
+## F9 — §10.1's "the third overload may be moot" was wrong, and nothing would have caught it
+
+**Guide:** does not mention the propagation overload at all. `Middleware`'s TSDoc
+in the engine describes all three signatures, but only an author who reads the
+engine source finds them.
+
+**Reality:** the design reasoned that because this middleware declares no `In`
+prerequisites, the engine's third (propagation) overload was probably
+unnecessary, and recorded it as an open question (§10.1). That reasoning was
+wrong, and the reason is worth writing down: the propagation form is not about
+**this** layer's prerequisites. It is about the **wrapped handler's**. A handler
+that declares an upstream key this layer does not contribute, composed without an
+anchor, needs the requirement to travel outward — and a two-overload interface
+cannot express that:
+
+```
+TS2345: Argument of type '(_req: Request, ctx: { jwtClaims: JWTClaims | null;
+flags: { a: boolean; }; }) => Promise<Response>' is not assignable to parameter
+of type '(req: Request, ctx: object & { flags: Resolved<{ a: false; }>; }) =>
+Promise<Response>'.
+  Property 'jwtClaims' is missing in type '{ flags: Resolved<{ a: false; }>; }'
+```
+
+An author who ships two overloads gets a package that works in every example the
+guide shows and fails on the first consumer who composes it unanchored.
+
+**Would have helped:** one line in the guide — "if you hand-write a signature,
+you need all three of the engine's overloads, not the two you will reach for. The
+propagation form covers the wrapped handler's prerequisites, not your own."
+
+<!-- Entry F10 is added by Task 9: CI and release. -->

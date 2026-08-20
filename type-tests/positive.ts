@@ -104,3 +104,19 @@ pipeline(
 withOpenFeature({ client, flags: { a: false } }, async (_req, ctx) =>
   Response.json({ a: ctx.flags.a }),
 ) satisfies FetchHandler
+
+// A13 — propagation probe (design §10.1). The inner handler declares an
+// upstream requirement this layer does not contribute, and the stack is built
+// WITHOUT an anchor, so `Base` collapses to its constraint and the requirement
+// must travel outward instead. The engine models this with a third overload.
+const _a13Unanchored = withOpenFeature(
+  { client, flags: { a: false } },
+  async (
+    _req,
+    ctx: { jwtClaims: JWTClaims | null; flags: { a: boolean } },
+  ): Promise<Response> =>
+    Response.json({ sub: ctx.jwtClaims?.sub, a: ctx.flags.a }),
+)
+
+// …and wrapping it in the contributor must then discharge the requirement.
+withClaims(_a13Unanchored) satisfies FetchHandler

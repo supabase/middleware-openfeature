@@ -72,12 +72,14 @@ pipeline(
 
 // A11 — a key collision must be reported against THIS call, naming the key.
 // `NoConflict` on the handler parameter is what makes the message readable.
-// Reported as TS2345, not TS2769: this bespoke interface has only ONE
-// handler-accepting signature, so the mismatch is a plain argument error rather
-// than an overload-set failure. The engine's own `Middleware` has two and does
-// report TS2769. Either way the sentinel text reaches the reader and names the
-// colliding key, which is the point of siting it on the parameter.
-// @expect-error TS2345 middleware-conflict: key 'flags' is already present on the upstream context
+// TS2769 with the sentinel in the per-overload breakdown, matching what
+// `Conflict`'s docblock describes. The code depends on how many signatures can
+// accept a handler: with only the cascade overload this reported TS2345, a
+// plain argument mismatch; adding the propagation overload (A13) made it two,
+// and the diagnostic became an overload-set failure. Either way the sentinel
+// reaches the reader and names the colliding key, which is the point of siting
+// it on the parameter rather than on the `Base` constraint.
+// @expect-error TS2769 middleware-conflict: key 'flags' is already present on the upstream context
 withOpenFeature(
   { client, flags: { a: false } },
   withOpenFeature({ client, flags: { b: false } }, async () => new Response()),

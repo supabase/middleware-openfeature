@@ -27,7 +27,15 @@ function readExpectations() {
   return expectations
 }
 
-/** Parse `path(line,col): error TS2339: message` out of tsc's stdout. */
+/**
+ * Parse `path(line,col): error TS2339: message` out of tsc's stdout.
+ *
+ * Indented continuation lines are folded into the preceding diagnostic's
+ * message. TS2769 ("No overload matches this call") puts the *useful* text —
+ * including the `middleware-conflict` sentinel — in the per-overload breakdown
+ * below the top-level line, so a parser that reads only top-level lines cannot
+ * assert on it.
+ */
 function readDiagnostics(stdout) {
   const diagnostics = []
   for (const line of stdout.split('\n')) {
@@ -39,6 +47,8 @@ function readDiagnostics(stdout) {
         code: match[4],
         message: match[5],
       })
+    } else if (diagnostics.length > 0 && /^\s+\S/.test(line)) {
+      diagnostics[diagnostics.length - 1].message += `\n${line}`
     }
   }
   return diagnostics

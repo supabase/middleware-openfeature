@@ -78,6 +78,37 @@ export interface WithOpenFeature {
       ) => Promise<Response>
     >,
   ): (req: Request, ctx?: Base) => Promise<Response>
+  // Handler call, propagation form — reached only when the signature above
+  // fails, which is exactly the unanchored-prerequisite case. With an anchor,
+  // `Base` carries the accumulated upstream inward and the cascade above
+  // already satisfies the wrapped handler at any depth. Unanchored there is
+  // nothing to carry — `Base` collapses to its constraint — so the requirement
+  // has to travel *outward* instead: `Ctx` is read off the wrapped handler's
+  // declared `ctx` and republished minus the key this layer contributes, until
+  // some enclosing layer discharges it.
+  //
+  // `Ctx extends BaseContext & { flags?: Resolved<F> }` is what keeps the
+  // `Omit` honest: omitting by key name alone would discharge a requirement for
+  // `flags` of the wrong shape. The optional-key constraint checks the type
+  // where the key is present and is vacuous where it is not.
+  //
+  // Verified necessary, not speculative — design §10.1 recorded this as an open
+  // question on the grounds that `In` is empty here. It is required anyway:
+  // without it, an unanchored stack whose handler declares an upstream key
+  // fails with "Property 'jwtClaims' is missing in type
+  // '{ flags: Resolved<{ a: false; }>; }'". See A13 in type-tests/positive.ts.
+  <
+    F extends FlagDefaults,
+    Base extends BaseContext = BaseContext,
+    Ctx extends BaseContext & { flags?: Resolved<F> } = BaseContext,
+  >(
+    config: WithOpenFeatureConfig<F, Base>,
+    handler: NoConflict<
+      'flags',
+      Base,
+      (req: Request, ctx: Ctx) => Promise<Response>
+    >,
+  ): (req: Request, ctx: Base & Omit<Ctx, 'flags'>) => Promise<Response>
   // Config-only call — an `Entry` for a `pipeline` array. `NoInfer` must NEVER
   // wrap `config` here: an explicit param annotation on the context callback is
   // the sole channel by which `Base` can be supplied in this form, and
