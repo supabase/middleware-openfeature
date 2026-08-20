@@ -3,22 +3,22 @@ import type { Client } from '@openfeature/server-sdk'
 import type { FlagClient, Resolved } from '../src/types.js'
 
 // A3 — a real OpenFeature `Client` satisfies `FlagClient` as-is, with zero
-// adapter code (design §2.4). This is the exact check that would have caught
-// the §2.3 error, where an earlier draft assumed `@openfeature/core` exported
-// a server `Client`.
+// adapter code. This is the exact check that would have caught an early
+// drafting error, where we assumed `@openfeature/core` exported a server
+// `Client`. It does not.
 declare const real: Client
 const _a3: FlagClient = real
 void _a3
 
 // A4 — `Widen` widens a literal default so a general value fits the slot.
 // Without it, `flags: { beta: false }` types `ctx.flags.beta` as `false` and
-// `ctx.flags.beta = someBoolean` fails (design §2.6).
+// `ctx.flags.beta = someBoolean` fails.
 declare const anyBool: boolean
 const _a4: Resolved<{ beta: false }>['beta'] = anyBool
 void _a4
 
 // A4b — the same for string and number, so the widening is not relied on for
-// booleans only (design §4.3).
+// booleans only.
 declare const anyString: string
 declare const anyNumber: number
 const _a4b: Resolved<{ theme: 'light'; maxItems: 10 }> = {
@@ -54,7 +54,7 @@ withClaims(
 
 // A2 — pipeline form, config callback reading upstream. The one-line param
 // annotation is the documented workaround for the evaluation-order limit in
-// design §2.5; without it this is A7, which must NOT compile.
+// evaluation order; without it this is A7, which must NOT compile.
 pipeline(
   [
     withClaims(),
@@ -70,8 +70,8 @@ pipeline(
 ) satisfies FetchHandler
 
 // A8 — pipeline composition types normally: the handler sees every upstream key
-// AND the contribution, at full fidelity. This is what proves design §2.5's
-// limit is scoped to the config callback and is not a `pipeline` defect.
+// AND the contribution, at full fidelity. This is what proves the limit is
+// scoped to the config callback and is not a `pipeline` defect.
 pipeline(
   [
     withClaims(),
@@ -105,7 +105,7 @@ withOpenFeature({ client, flags: { a: false } }, async (_req, ctx) =>
   Response.json({ a: ctx.flags.a }),
 ) satisfies FetchHandler
 
-// A13 — propagation probe (design §10.1). The inner handler declares an
+// A13 — propagation probe. The inner handler declares an
 // upstream requirement this layer does not contribute, and the stack is built
 // WITHOUT an anchor, so `Base` collapses to its constraint and the requirement
 // must travel outward instead. The engine models this with a third overload.

@@ -1,5 +1,5 @@
 /**
- * Design §7, run 2: does the stack boot and resolve on the Deno runtime that
+ * Run 2: does the stack boot and resolve on the Deno runtime that
  * Supabase Edge Functions actually use?
  *
  * The same probe set as smoke/deno/main.ts, so the two runs are directly

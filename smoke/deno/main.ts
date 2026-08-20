@@ -1,5 +1,5 @@
 /**
- * Design §7, run 1: does `VercelProvider` resolve a real flag on Deno, with the
+ * Run 1: does `VercelProvider` resolve a real flag on Deno, with the
  * provider isolated from the Supabase edge sandbox?
  *
  * Structured as independent probes rather than one pass/fail, because the
@@ -42,7 +42,7 @@ const hasCredential = Boolean(edgeConfig || flagsEnv)
 
 // ---------------------------------------------------------------------------
 // Probe 1 — does `@openfeature/server-sdk` load on Deno at all?
-// Design §7 names its `node:events` import as the first thing to check if the
+// The design doc names its `node:events` import as the first thing to check if the
 // worker fails to boot. This is answerable with no credentials.
 // ---------------------------------------------------------------------------
 let OpenFeature: any
@@ -69,7 +69,7 @@ try {
 // ---------------------------------------------------------------------------
 // Probe 2 — does the Vercel provider module load?
 // Its dependency chain reaches jose, whose `deno` export condition should
-// resolve to a WebCrypto build with no node: imports (design §2.8).
+// resolve to a WebCrypto build with no node: imports.
 // ---------------------------------------------------------------------------
 let VercelProvider: any
 try {
@@ -92,7 +92,7 @@ try {
 
 // ---------------------------------------------------------------------------
 // Probe 3 — is `process.env` readable? `@vercel/oidc` reads
-// `process.env.VERCEL_OIDC_TOKEN`, not `Deno.env` (design §2.7).
+// `process.env.VERCEL_OIDC_TOKEN`, not `Deno.env`.
 // ---------------------------------------------------------------------------
 try {
   const processEnv = (globalThis as any).process?.env
@@ -115,7 +115,7 @@ try {
 // Probe 4 — does this package's own middleware run on Deno, end to end?
 // Uses a hand-rolled FlagClient, so it needs no Vercel account. This isolates
 // "does @supabase/middleware-openfeature work on Deno" from "does Vercel Flags
-// work on Deno", which design §7 conflates into a single question.
+// work on Deno", which the design doc treats as a single question.
 // ---------------------------------------------------------------------------
 try {
   const { withOpenFeature } = await import('@supabase/middleware-openfeature')
@@ -263,6 +263,6 @@ const summary = {
 console.log(JSON.stringify(summary, null, 2))
 
 // Exit non-zero only on a real failure. A blocked probe is a missing
-// credential, not a broken runtime — design §7 treats that as a publishable
+// credential, not a broken runtime — the design doc treats that as a publishable
 // finding rather than a failure.
 Deno.exit(summary.tally.failed > 0 ? 1 : 0)

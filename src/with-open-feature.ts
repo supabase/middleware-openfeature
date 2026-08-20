@@ -36,7 +36,7 @@ export type AnyOpenFeatureConfig = WithOpenFeatureConfig<
  * hand-rolled `FlagClient`, or a network fault that escapes the client. Falling
  * back per-flag is what keeps the middleware from ever short-circuiting — a
  * provider outage is not a bad *request*, so there is nothing to reject
- * (design §5.2, Rule 8).
+ * and Rule 8: a provider being down is not a bad request.
  */
 async function resolveFlag(
   client: FlagClient,
@@ -95,7 +95,7 @@ export const withOpenFeatureRuntime: Middleware<
     const evaluationContext = config.context?.(req, ctx)
 
     // Resolve concurrently: one round trip's latency for the whole set rather
-    // than the sum (design §5.1).
+    // than the sum.
     const resolved = await Promise.all(
       Object.entries(config.flags).map(
         async ([flagKey, defaultValue]) =>

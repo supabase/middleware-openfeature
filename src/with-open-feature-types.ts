@@ -65,8 +65,8 @@ export interface WithOpenFeature {
   // with no annotation. `NoInfer` on the handler's `ctx` keeps that cascade
   // alive past two layers — left inferable it becomes a second inference site
   // that outranks the contextual return type and collapses `Base` to its
-  // constraint. `config` is deliberately NOT wrapped in `NoInfer`: design §4.2
-  // verified it is unnecessary here and fatal on the overload below.
+  // constraint. `config` is deliberately NOT wrapped in `NoInfer`: it is
+  // unnecessary here and fatal on the config-only overload below.
   <F extends FlagDefaults, Base extends BaseContext = BaseContext>(
     config: WithOpenFeatureConfig<F, Base>,
     handler: NoConflict<
@@ -92,8 +92,9 @@ export interface WithOpenFeature {
   // `flags` of the wrong shape. The optional-key constraint checks the type
   // where the key is present and is vacuous where it is not.
   //
-  // Verified necessary, not speculative — design §10.1 recorded this as an open
-  // question on the grounds that `In` is empty here. It is required anyway:
+  // Verified necessary, not speculative. The design doc first recorded this as
+  // an open question, on the grounds that `In` is empty here. It is required
+  // anyway:
   // without it, an unanchored stack whose handler declares an upstream key
   // fails with "Property 'jwtClaims' is missing in type
   // '{ flags: Resolved<{ a: false; }>; }'". See A13 in type-tests/positive.ts.
@@ -112,7 +113,7 @@ export interface WithOpenFeature {
   // Config-only call — an `Entry` for a `pipeline` array. `NoInfer` must NEVER
   // wrap `config` here: an explicit param annotation on the context callback is
   // the sole channel by which `Base` can be supplied in this form, and
-  // `NoInfer` closes it (design §4.2, last row).
+  // `NoInfer` closes it.
   <F extends FlagDefaults, Base extends BaseContext = BaseContext>(
     config: WithOpenFeatureConfig<F, Base>,
   ): Entry<'flags', Record<never, never>, Resolved<F>>

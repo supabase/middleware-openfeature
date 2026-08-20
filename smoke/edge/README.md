@@ -1,4 +1,4 @@
-# Run 2 — Supabase Edge Runtime (design §7)
+# Run 2 — Supabase Edge Runtime
 
 Raw results. The summary lives in [`docs/deno-vercel-findings.md`](../../docs/deno-vercel-findings.md);
 this file is the unedited output it is written from.
