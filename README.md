@@ -149,6 +149,15 @@ const client: FlagClient = {
 }
 ```
 
+## Running on Deno and Supabase Edge Functions
+
+This package was smoke-tested against Vercel Flags on both plain Deno and the
+Supabase Edge Runtime. Everything on the Supabase side works — including the
+`sys`/`hostname` permission the Vercel provider needs at module load, which is
+the one thing that could have made the integration impossible. The results,
+including what is still unproven and why, are in
+[`docs/deno-vercel-findings.md`](./docs/deno-vercel-findings.md).
+
 ## Development
 
 ```bash
