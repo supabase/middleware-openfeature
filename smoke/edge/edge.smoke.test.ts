@@ -34,7 +34,7 @@ beforeAll(async () => {
 }, 180_000)
 
 it('boots the worker with @openfeature/server-sdk loaded', () => {
-  // The worker booting at all answers design §7's risk about node:events
+  // The worker booting at all answers the design doc's risk about node:events
   // reaching Deno through the server-sdk.
   const probe = probeResult.probes.find(
     (p: any) => p.name === 'openfeature-server-sdk-loads',
@@ -57,7 +57,7 @@ it('reports whether @vercel/flags-core/openfeature loads in the sandbox', () => 
 })
 
 it('reports whether process.env is available in the sandbox', () => {
-  // Also not asserted — design §7 lists it as unverified inside Supabase's
+  // Also not asserted — the design doc lists it as unverified inside Supabase's
   // sandbox specifically, and @vercel/oidc depends on it.
   const probe = probeResult.probes.find(
     (p: any) => p.name === 'process-env-available',

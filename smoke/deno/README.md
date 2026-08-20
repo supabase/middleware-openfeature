@@ -1,4 +1,4 @@
-# Run 1 — plain `deno run` (design §7)
+# Run 1 — plain `deno run`
 
 Raw results. The summary lives in [`docs/deno-vercel-findings.md`](../../docs/deno-vercel-findings.md);
 this file is the unedited output it is written from.
@@ -92,7 +92,7 @@ pnpm smoke:deno
 ## Permission matrix
 
 Which Deno permissions are actually required, measured by re-running with each
-dropped. Relevant because design §7 predicted the filesystem token cache
+dropped. Relevant because the design document predicted the filesystem token cache
 (`LOCALAPPDATA` / `XDG_DATA_HOME`) would need `--allow-read`, and Supabase Edge
 Functions may not grant it.
 
@@ -103,7 +103,7 @@ Functions may not grant it.
 | `--allow-env --allow-net` (no read, no sys)        | 3              |
 | `--allow-env` only                                 | 3              |
 
-**`--allow-read` is not required.** §7's third risk did not fire — at least not
+**`--allow-read` is not required.** The third predicted risk did not fire — at least not
 without a real OIDC token exercising the cache write path.
 
 **`--allow-sys` IS required, and earlier than expected.** Dropping it fails
@@ -114,22 +114,22 @@ resolved:
 NotCapable: Requires sys access to "hostname", run again with the --allow-sys flag
 ```
 
-Design §7 does not list this risk. It is the most consequential finding of run 1
+The design document does not list this risk. It is the most consequential finding of run 1
 for the Supabase Edge Functions question, because it gates the import itself
 rather than a resolution call.
 
 ## Transitive versions Deno actually resolved
 
-Design §2.7's table was built from a static read of `@vercel/flags-core@1.7.1`'s
+The design document's dependency table was built from a static read of `@vercel/flags-core@1.7.1`'s
 bundle. Deno's own resolution pulled newer transitive versions:
 
-| Package             | §2.7 table | Resolved here                      |
-| ------------------- | ---------- | ---------------------------------- |
-| `@vercel/functions` | 3.4.3      | **3.9.3**                          |
-| `@vercel/oidc`      | 3.5.0      | 3.5.0 **and** 3.8.4 (both present) |
+| Package             | Design table | Resolved here                      |
+| ------------------- | ------------ | ---------------------------------- |
+| `@vercel/functions` | 3.4.3        | **3.9.3**                          |
+| `@vercel/oidc`      | 3.5.0        | 3.5.0 **and** 3.8.4 (both present) |
 
-Also present and absent from §2.7's table: `zod@4.1.11`, `@vercel/cli-config@0.2.3`,
-`@vercel/cli-exec@1.0.1`. Any conclusion §2.7 drew about `node:` imports or
+Also present, and absent from that table: `zod@4.1.11`, `@vercel/cli-config@0.2.3`,
+`@vercel/cli-exec@1.0.1`. Any conclusion it drew about `node:` imports or
 `process.env` reads should be re-checked against these versions before it is
 quoted in the pitch.
 

@@ -3,13 +3,13 @@ import type { Middleware } from '@supabase/middleware'
 
 import type { FlagClient } from '../src/types.js'
 
-/** Stand-in for `@supabase/server`'s claims shape (design §6). */
+/** Stand-in for `@supabase/server`'s claims shape. */
 export type JWTClaims = { sub: string; role: string }
 
 /**
  * Stand-in for `withClaims` from `@supabase/server`. Declared locally so the
  * type tests exercise the composition without this package depending on
- * Supabase auth (design §6).
+ * Supabase auth.
  */
 export const withClaims: Middleware<
   'jwtClaims',

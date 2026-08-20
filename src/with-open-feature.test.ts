@@ -23,7 +23,7 @@ type Call = {
  * A recording `FlagClient`. `values` overrides what the provider returns for a
  * given key; anything absent resolves to the passed default. `rejectKeys` makes
  * the client reject for those keys, which is the hand-rolled-client failure
- * mode design §5.2 says must fall back rather than propagate.
+ * mode that must fall back to the declared default rather than propagate.
  */
 function makeClient(
   options: { values?: Record<string, FlagValue>; rejectKeys?: string[] } = {},
@@ -163,8 +163,8 @@ describe('withOpenFeatureRuntime', () => {
   it('gives the context callback the accumulated upstream ctx at runtime', async () => {
     const { client, calls } = makeClient()
 
-    // Composed under a real upstream middleware, which is the path design §6
-    // describes: `defineMiddleware` passes the accumulated context object
+    // Composed under a real upstream middleware, which is the production path:
+    // `defineMiddleware` passes the accumulated context object
     // through, so an upstream key is visible to the config callback.
     const withClaims = defineMiddleware<
       'jwtClaims',

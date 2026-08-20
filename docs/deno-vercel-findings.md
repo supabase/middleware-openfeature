@@ -43,7 +43,7 @@ Raw output: [`smoke/deno/README.md`](../smoke/deno/README.md),
 
 ## The finding that matters
 
-Design §7 listed four risks. Three did not fire. The one real gate was **not on
+The design document listed four risks. Three did not fire. The one real gate was **not on
 that list**, and it was found by run 1 and cleared by run 2.
 
 `@vercel/flags-core/openfeature` requires **sys access to `"hostname"` at module
@@ -61,15 +61,15 @@ amount of configuration works around it.
 **The Supabase Edge Runtime grants it.** The provider module loads in the edge
 sandbox, verified on `supabase-edge-runtime-1.74.3`.
 
-## What each of design §7's risks turned out to be
+## What each predicted risk turned out to be
 
-| Risk (design §7)                                                   | Outcome                                                                                                                                     |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `node:events` via `@openfeature/server-sdk` reaching Deno          | **Non-issue.** Loads on both runtimes. §7 listed this first; it is the least of the four.                                                   |
-| `process.env` inside the Supabase edge sandbox                     | **Available.** `typeof process.env === 'object'` in the edge worker.                                                                        |
-| Filesystem token cache needing `--allow-read`                      | **Did not fire.** All four passing probes run without `--allow-read`. May yet appear once a real OIDC token exercises the cache write path. |
-| OIDC off-Vercel — no ambient `VERCEL_OIDC_TOKEN`                   | **Untested, and now the only open question.** Needs an account.                                                                             |
-| _(not on §7's list)_ `--allow-sys` for `"hostname"` at module load | **The actual gate — and it is granted.** See above.                                                                                         |
+| Predicted risk                                                    | Outcome                                                                                                                                     |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `node:events` via `@openfeature/server-sdk` reaching Deno         | **Non-issue.** Loads on both runtimes. It was listed first; it is the least of the four.                                                    |
+| `process.env` inside the Supabase edge sandbox                    | **Available.** `typeof process.env === 'object'` in the edge worker.                                                                        |
+| Filesystem token cache needing `--allow-read`                     | **Did not fire.** All four passing probes run without `--allow-read`. May yet appear once a real OIDC token exercises the cache write path. |
+| OIDC off-Vercel — no ambient `VERCEL_OIDC_TOKEN`                  | **Untested, and now the only open question.** Needs an account.                                                                             |
+| _(not on the list)_ `--allow-sys` for `"hostname"` at module load | **The actual gate — and it is granted.** See above.                                                                                         |
 
 One prediction from static analysis held: `jose@5.2.1`, a direct dependency of
 `@vercel/flags-core`, ships a `deno` export condition resolving to a WebCrypto
@@ -89,18 +89,18 @@ _for_ the structural approach rather than against it. The same package works
 against 1.18.0 (both smoke runs) and 1.23.0 (the type tests and the TypeScript
 floor fixture) with no conditional code.
 
-## Design §2.7's version table is stale
+## The design document's dependency table is stale
 
-§2.7 was built from a static read of `@vercel/flags-core@1.7.1`'s bundle. Deno's
+That table was built from a static read of `@vercel/flags-core@1.7.1`'s bundle. Deno's
 own resolution pulled newer transitive versions:
 
-| Package             | §2.7 says | Actually resolved                 |
-| ------------------- | --------- | --------------------------------- |
-| `@vercel/functions` | 3.4.3     | **3.9.3**                         |
-| `@vercel/oidc`      | 3.5.0     | 3.5.0 **and** 3.8.4, both present |
+| Package             | Table says | Actually resolved                 |
+| ------------------- | ---------- | --------------------------------- |
+| `@vercel/functions` | 3.4.3      | **3.9.3**                         |
+| `@vercel/oidc`      | 3.5.0      | 3.5.0 **and** 3.8.4, both present |
 
-Also present and absent from §2.7's table: `zod@4.1.11`, `@vercel/cli-config@0.2.3`,
-`@vercel/cli-exec@1.0.1`. Any §2.7 conclusion about `node:` imports or
+Also present, and absent from that table: `zod@4.1.11`, `@vercel/cli-config@0.2.3`,
+`@vercel/cli-exec@1.0.1`. Any conclusion it drew about `node:` imports or
 `process.env` reads should be re-checked against these versions before it is
 quoted in the pitch. The runtime results above supersede it either way — they
 were measured, not inferred.
@@ -116,7 +116,7 @@ A partner wanting Vercel Flags on Supabase Edge Functions today needs:
 3. Nothing else. No polyfills, no compatibility flags, no forks. The runtime
    requirements are met.
 
-The one thing still to prove is OIDC off-Vercel. Design §7 anticipated that
+The one thing still to prove is OIDC off-Vercel. The design document anticipated that
 `vercel env pull` writes a short-lived token, so a CI-persistent test likely
 needs a static credential path — that remains the expected sticking point, and
 it is an _account_ problem rather than a _runtime_ problem.

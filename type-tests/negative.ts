@@ -17,7 +17,7 @@ import { client, withClaims } from './fixtures.js'
 
 // A5 — proves the nesting form's `ctx` is genuinely typed and not silently
 // `any`. A bogus key must be rejected, and the message must print the real
-// accumulated type (design §2.5).
+// accumulated type.
 // @expect-error TS2339 Property 'nope' does not exist on type
 withClaims(
   withOpenFeature(
@@ -45,7 +45,7 @@ withClaims(
 ) satisfies FetchHandler
 
 // A7 — pipeline form, config callback reads upstream WITHOUT the annotation.
-// This is design §2.5's limit, pinned as a test so the documentation and the
+// This is the documented limit, pinned as a test so the docs and the
 // compiler cannot drift apart. NOTE: only the callback fails — the handler in
 // this same expression types fine, which is what A8 in positive.ts proves.
 // @expect-error TS2339 Property 'jwtClaims' does not exist on type 'object'

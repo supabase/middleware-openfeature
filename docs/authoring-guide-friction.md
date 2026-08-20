@@ -1,25 +1,28 @@
 # Authoring-guide friction log
 
-Every place `@supabase/middleware`'s `docs/authoring-guide.md` was insufficient
-while building this package from scratch, recorded as it was hit. This is a
-first-class deliverable of the dogfooding exercise (design §8, §9), not a
-retrospective.
+Every place `@supabase/middleware`'s `docs/authoring-guide.md` fell short while
+building this package from scratch, written down as we hit it. This is one of
+the outputs of the work, not a write-up done afterwards.
 
 Format: what the guide says → what actually happened → what would have helped.
 
-## F1 — §4's `package.json` is ESM-only; the engine ships dual
+**Section numbers in this file always mean sections of the authoring guide**
+(`docs/authoring-guide.md` in `supabase/middleware`), not of this file or of the
+design document.
 
-**Guide:** §4's example declares a single `exports` condition pair
+## F1 — section 4's `package.json` is ESM-only; the engine ships dual
+
+**Guide:** section 4's example declares a single `exports` condition pair
 (`types` + `default`) pointing at `./dist/index.js`.
 **Reality:** the engine's own `package.json` ships dual ESM+CJS with four
 condition entries per subpath and a `main`/`types` fallback pair. An author
-copying §4 verbatim ships ESM-only and will not learn that from the guide.
+copying section 4 verbatim ships ESM-only and will not learn that from the guide.
 **Would have helped:** one sentence saying ESM-only is the recommended default
 and that dual output is the engine's own choice, not a requirement.
 
-## F2 — §4 omits the TypeScript peer dependency and its floor
+## F2 — section 4 omits the TypeScript peer dependency and its floor
 
-**Guide:** §4's `devDependencies` list `tsdown`, `typescript`, `vitest`. No
+**Guide:** section 4's `devDependencies` list `tsdown`, `typescript`, `vitest`. No
 `peerDependencies`.
 **Reality:** any middleware that uses `NoInfer` in an exported signature emits
 it into the published `.d.ts` and therefore inherits the engine's TypeScript
@@ -27,45 +30,45 @@ it into the published `.d.ts` and therefore inherits the engine's TypeScript
 > = 5.4 consumer floor (engine commit `b673919`). That obligation is documented
 > in the engine's root README, not in the authoring guide, so an author following
 > only the guide will not declare it.
-> **Would have helped:** §4 declaring `"peerDependencies": { "typescript": ">=5.4" }`
+> **Would have helped:** section 4 declaring `"peerDependencies": { "typescript": ">=5.4" }`
 > with `peerDependenciesMeta.typescript.optional = true`, and a line explaining why.
 
 ## F3 — the guide has no scaffolding checklist beyond `package.json`
 
-**Guide:** §4 gives `package.json` and nothing else.
+**Guide:** section 4 gives `package.json` and nothing else.
 **Reality:** a from-scratch repo also needs `tsconfig.json` (which compiler
 options? the engine's are load-bearing for the type tests — `strict`,
 `target ES2020`, `moduleResolution bundler`), `tsdown.config.ts`,
 `vitest.config.ts`, a formatter config, `.gitignore` and a licence. Each was
-recovered by reading the engine's repo, which §4 does not tell you to do.
+recovered by reading the engine's repo, which section 4 does not tell you to do.
 **Would have helped:** a short "the rest of the files" block, or an explicit
 pointer to the engine repo as the reference scaffold.
 
 ## F4 — no guidance on where type tests live or how to run them
 
-**Guide:** §3 covers runtime tests with vitest. Type-level checks appear only as
+**Guide:** section 3 covers runtime tests with vitest. Type-level checks appear only as
 an inline `satisfies FetchHandler` inside a runtime test file.
 **Reality:** this package's correctness is mostly type-level, including
-must-NOT-compile cases (design §4.2, Appendix A). Those cannot live in a file
+must-NOT-compile cases (see the design document's type-design section and its appendix). Those cannot live in a file
 that `tsc --noEmit` checks, so they need their own tsconfig and a harness that
 asserts the expected diagnostics appear. The guide offers no pattern.
-**Would have helped:** a §3.1 showing a `type-tests/` directory, a second
+**Would have helped:** a section 3.1 showing a `type-tests/` directory, a second
 tsconfig, and a negative-test harness.
 
-## F5 — §4's `exports` block does not match what tsdown actually emits
+## F5 — section 4's `exports` block does not match what tsdown actually emits
 
-**Guide:** §4's `exports` points at `./dist/index.js` and `./dist/index.d.ts`,
-and §4's `devDependencies` name `tsdown` as the bundler. The two are presented
+**Guide:** section 4's `exports` points at `./dist/index.js` and `./dist/index.d.ts`,
+and section 4's `devDependencies` name `tsdown` as the bundler. The two are presented
 together as a working pair.
 
 **Reality:** they are not. `tsdown` defaults `fixedExtension` to `true` on the
 node platform, so `format: ['esm']` emits `dist/index.mjs` and
-`dist/index.d.mts`. Copying §4 verbatim therefore produces a package whose
+`dist/index.d.mts`. Copying section 4 verbatim therefore produces a package whose
 `exports` map points at two files that do not exist — and nothing in the build
 complains. `pnpm build` reports success; the breakage only surfaces when a
 consumer tries to import the package.
 
-Verified here: the first `pnpm build` of this repo, scaffolded from §4 with no
+Verified here: the first `pnpm build` of this repo, scaffolded from section 4 with no
 deviations, emitted
 
 ```
@@ -77,23 +80,23 @@ against an `exports` map naming `./dist/index.js`.
 
 **Fix applied:** `fixedExtension: false` in `tsdown.config.ts`. Since
 `"type": "module"` already marks the package as ESM, a plain `.js` extension is
-unambiguous, and it keeps §4's `exports` block copyable verbatim.
+unambiguous, and it keeps section 4's `exports` block copyable verbatim.
 
-**Would have helped:** §4 shipping the matching `tsdown.config.ts` next to the
+**Would have helped:** section 4 shipping the matching `tsdown.config.ts` next to the
 `package.json`, rather than leaving the author to discover that the two halves
 of the guide's own example disagree. This is the single highest-value fix in
 this log: it is silent, it hits every author on their first build, and it is one
 line.
 
-## F6 — §3's test recipe has no way to supply an upstream context
+## F6 — section 3's test recipe has no way to supply an upstream context
 
-**Guide:** §3 shows a middleware tested by calling the composed handler with a
+**Guide:** section 3 shows a middleware tested by calling the composed handler with a
 `Request` — `await handler(post({ name: 'ada' }))` — and says "no test harness
 is needed. A composed middleware is just a `(req, ctx?) => Promise<Response>`,
 so you call it with a `Request` and assert on the `Response`."
 
 **Reality:** true only for a middleware that ignores upstream context. This one
-takes a `context` callback that reads upstream keys (design §6), and the obvious
+takes a `context` callback that reads upstream keys, and the obvious
 way to test it — pass the context positionally, which the published signature
 openly invites — **silently does not work**:
 
@@ -120,7 +123,7 @@ The two forms that _do_ work are now pinned as tests in
 - `{ ...seedContext(), jwtClaims: … }` — the mint path `seedContext`'s docstring
   sanctions for hosts embedding the engine
 
-**Would have helped:** two lines in §3 — "to test against an upstream context,
+**Would have helped:** two lines in section 3 — "to test against an upstream context,
 either nest under the contributing middleware or spread your keys onto
 `seedContext()`; a plain object in the `ctx` position is treated as the host's
 platform argument."
@@ -158,11 +161,11 @@ guide would have caught that.
 **Would have helped:** a guide section walking one bespoke signature end to end,
 with those three rules stated. This package is the natural worked example, and
 its type tests — positive plus the message-asserted must-NOT-compile cases —
-could serve as the guide's regression suite (design §9.3, ask E2).
+could serve as the guide's regression suite (design document, ask E2).
 
 ## F8 — no pattern for must-not-compile tests
 
-**Guide:** §3's only type-level assertion is an inline `satisfies FetchHandler`
+**Guide:** section 3's only type-level assertion is an inline `satisfies FetchHandler`
 in a runtime test file.
 
 **Reality:** a middleware whose contract is mostly type-level needs cases that
@@ -211,7 +214,7 @@ harness pattern this package now has, and `Conflict`'s docblock noting that the
 diagnostic code depends on how many signatures can accept a handler — and that
 the sentinel moves into the breakdown when it does.
 
-## F9 — §10.1's "the third overload may be moot" was wrong, and nothing would have caught it
+## F9 — "the third overload may be moot" was wrong, and nothing would have caught it
 
 **Guide:** does not mention the propagation overload at all. `Middleware`'s TSDoc
 in the engine describes all three signatures, but only an author who reads the
@@ -219,7 +222,7 @@ engine source finds them.
 
 **Reality:** the design reasoned that because this middleware declares no `In`
 prerequisites, the engine's third (propagation) overload was probably
-unnecessary, and recorded it as an open question (§10.1). That reasoning was
+unnecessary, and recorded it as an open question. That reasoning was
 wrong, and the reason is worth writing down: the propagation form is not about
 **this** layer's prerequisites. It is about the **wrapped handler's**. A handler
 that declares an upstream key this layer does not contribute, composed without an
@@ -243,7 +246,7 @@ propagation form covers the wrapped handler's prerequisites, not your own."
 
 ## F10 — no release or CI guidance at all
 
-**Guide:** §4 ends at `package.json`.
+**Guide:** section 4 ends at `package.json`.
 
 **Reality:** a publishable package also needs a CI workflow, a release
 mechanism, and a decision about the TypeScript floor check. All of it was
@@ -255,7 +258,7 @@ it is the one that matters most: it is the only thing standing between a
 `NoInfer` in an exported signature and a consumer on TypeScript 5.3 getting an
 unreadable error from a package that advertises no floor at all.
 
-**Would have helped:** a §6 pointing at the engine's workflows as a template, or
+**Would have helped:** a section 6 pointing at the engine's workflows as a template, or
 a minimal CI snippet in the guide itself — typecheck, test, build, and the
 consumer-floor check.
 
@@ -278,8 +281,8 @@ the form above does not, while still catching a real
 `import { EventEmitter } from 'node:events'`.
 
 Related: this is only a check of the package's **own source**. Whether Rule 7 is
-meant to constrain the dependency tree too is the open question in design §9.2 /
-ask E1 — and no grep can answer that one.
+meant to constrain the dependency tree too is the open question in the design
+document, ask E1 — and no grep can answer that one.
 
 **Would have helped:** the guide shipping the specifier-matching grep as the
 canonical Rule 7 check, so every author does not write the broken one first.
