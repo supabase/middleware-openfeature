@@ -174,6 +174,17 @@ This package was built from scratch against
 as a dogfooding exercise. Every place the guide fell short is recorded in
 [`docs/authoring-guide-friction.md`](./docs/authoring-guide-friction.md).
 
+## Releases
+
+**Not automated yet.** The package is not published to npm, and there is no
+release workflow.
+
+When it is time to publish, `@supabase/middleware`'s own
+`.github/workflows/release.yml` and `release-please-config.json` are the
+template: release-please opens a release PR from conventional commits, and npm
+publishing uses OIDC trusted publishing rather than a token. That setup needs
+two repository secrets, `GH_APP_ID` and `GH_APP_PRIVATE_KEY`.
+
 ## License
 
 MIT
