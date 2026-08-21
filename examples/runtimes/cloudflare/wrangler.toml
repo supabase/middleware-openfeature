@@ -1,6 +1,7 @@
 name = "middleware-openfeature-examples"
-# Point `main` at whichever example you want to run.
-main = "src/vercel-basic.ts"
+# All four examples behind one worker; see src/index.ts. The individual
+# src/<name>.ts files are the minimal single-example shape.
+main = "src/index.ts"
 compatibility_date = "2026-08-01"
 
 # Required: @openfeature/server-sdk imports node:events. This was verified to

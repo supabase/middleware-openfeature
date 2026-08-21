@@ -142,6 +142,10 @@ no handler and no entry point references the vendored path.
   (the client is injected, and it has no runtime dependency on `posthog-node`),
   but expect rough edges — see `providers/posthog.ts` for one its types have.
 
+## Deploying
+
+See [DEPLOY.md](./DEPLOY.md) for deploying all three to real URLs.
+
 ## Running them
 
 Each runtime folder has its own README. In short:
