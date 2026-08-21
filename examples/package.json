@@ -1,0 +1,22 @@
+{
+  "name": "@supabase/middleware-openfeature-examples",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Runnable examples. Not published — the root package ships files:[dist] only.",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openfeature/server-sdk": "1.18.0",
+    "@posthog/openfeature-node-provider": "^0.1.0",
+    "@supabase/middleware": "^0.3.0",
+    "@supabase/middleware-openfeature": "link:..",
+    "@supabase/server": "1.5.0-beta.0",
+    "@vercel/flags-core": "^1.7.1",
+    "posthog-node": "5.49.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
