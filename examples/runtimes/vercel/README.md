@@ -1,6 +1,13 @@
 # Vercel Functions
 
+> **Run `../../vendor.sh` first.** Until `@supabase/middleware-openfeature` is
+> published, this example depends on a packed copy at
+> `vendor/middleware-openfeature.tgz`. It cannot use `link:` to the repo root:
+> both Vercel and Cloudflare upload only the directory you deploy, so a symlink
+> pointing above it does not survive. `vendor/` is generated and gitignored.
+
 ```bash
+cd ../.. && pnpm build && ./vendor.sh && cd runtimes/vercel
 pnpm install
 vercel dev          # or: vercel deploy
 ```
