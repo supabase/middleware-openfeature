@@ -44,6 +44,13 @@ jobs:
       - name: Typecheck a consumer against the published types at TypeScript 5.4
         run: pnpm typecheck:consumer
 
+      # Compiles handlers/ and providers/ with no runtime globals available, so
+      # a handler that reaches for `process` or `Deno` fails here rather than at
+      # deploy time. Each runtime's entry points are checked by its own
+      # toolchain; see examples/README.md.
+      - name: Typecheck the examples against the built package
+        run: pnpm typecheck:examples
+
       # Match import specifiers, not the bare string `node:` — the doc comments
       # in src/types.ts mention `node:events` when explaining why the package
       # avoids @openfeature/server-sdk, and a naive grep fails on a clean tree.

@@ -45,6 +45,7 @@
     "typecheck": "tsc --noEmit",
     "typecheck:negative": "node scripts/check-negative-types.mjs",
     "typecheck:consumer": "pnpm --dir test/ts-floor install --ignore-workspace && pnpm --dir test/ts-floor exec tsc --noEmit",
+    "typecheck:examples": "pnpm --dir examples install --ignore-workspace && pnpm --dir examples exec tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
