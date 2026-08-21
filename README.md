@@ -186,6 +186,16 @@ results, including the OIDC token's 12-hour limit and why an SDK key is the
 better credential, are in
 [`docs/deno-vercel-findings.md`](./docs/deno-vercel-findings.md).
 
+## Examples
+
+Four handlers — Vercel Flags and PostHog, basic and claims-based targeting —
+each running unmodified on Supabase Edge Functions, Vercel Functions and
+Cloudflare Workers. Eight of the twelve combinations are verified against live
+providers.
+
+See [`examples/`](./examples/README.md), which also carries the credentials
+matrix: Vercel Flags needs nothing on Vercel and an SDK key everywhere else.
+
 ## Development
 
 ```bash

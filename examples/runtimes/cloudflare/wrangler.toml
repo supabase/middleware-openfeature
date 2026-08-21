@@ -1,0 +1,8 @@
+name = "middleware-openfeature-examples"
+# Point `main` at whichever example you want to run.
+main = "src/vercel-basic.ts"
+compatibility_date = "2026-08-01"
+
+# Required: @openfeature/server-sdk imports node:events. This was verified to
+# work — it was never the blocker people expect it to be.
+compatibility_flags = ["nodejs_compat"]
