@@ -110,6 +110,28 @@ than rejecting.
 The Vercel Functions column needs a deploy, so it is marked not run rather than
 assumed.
 
+## Before the package is published
+
+`@supabase/middleware-openfeature` is not on npm yet, so the examples cannot
+depend on it by version. They also cannot use `link:` to the repo root: Vercel
+and Cloudflare upload only the directory you deploy, and a symlink pointing
+above that directory does not survive the upload.
+
+Until it publishes, run `./vendor.sh` from `examples/`. It packs the package —
+the exact files `npm publish` would ship — into each runtime's `vendor/`, where
+`file:./vendor/middleware-openfeature.tgz` resolves inside the deploy root.
+Supabase gets the same treatment through `runtimes/supabase/sync.sh`.
+
+```bash
+pnpm build          # in the repo root
+./vendor.sh         # in examples/
+```
+
+When the package is published: delete `vendor.sh`, delete the `vendor/`
+directories, drop the pack step from `sync.sh`, and change the dependency in
+each runtime's `package.json` to a normal version range. Nothing else changes —
+no handler and no entry point references the vendored path.
+
 ## Requirements
 
 - `@supabase/server@1.5.0-beta.0` or later for `withClaims`. The published
