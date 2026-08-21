@@ -1,3 +1,5 @@
+import { OpenFeature } from '@openfeature/server-sdk'
+import { VercelProvider } from '@vercel/flags-core/openfeature'
 import type { FlagClient } from '@supabase/middleware-openfeature'
 
 /**
@@ -11,15 +13,19 @@ import type { FlagClient } from '@supabase/middleware-openfeature'
  * - **Everywhere else:** an SDK key in `FLAGS` (`vf_server_…`), from the Vercel
  *   dashboard under Flags → SDK Keys.
  *
+ * **Imports here are static, deliberately.** An earlier version loaded the
+ * provider with `await import()` inside this function. That works on Node and on
+ * Cloudflare Workers, but on the Supabase edge runtime it fails with
+ * `@vercel/flags-core: No flag definitions available. Bundled definitions not
+ * found.` — the same error you get with no credential at all, which makes it
+ * badly misleading. Static imports resolve it.
+ *
  * A hand-pulled OIDC token (`vercel env pull`) also authenticates off-Vercel,
  * but the examples do not use one: it expires after 12 hours, and on Cloudflare
  * Workers it fails outright with "No flag definitions available" even though the
  * same token works on Deno.
  */
 export async function createVercelFlagClient(): Promise<FlagClient> {
-  const { OpenFeature } = await import('@openfeature/server-sdk')
-  const { VercelProvider } = await import('@vercel/flags-core/openfeature')
-
   await OpenFeature.setProviderAndWait(new VercelProvider())
   return OpenFeature.getClient()
 }
