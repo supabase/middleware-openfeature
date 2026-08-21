@@ -1,5 +1,14 @@
 # Run 2 — Supabase Edge Runtime
 
+> **Superseded by a credentialed run on 2026-08-20.** These notes were written
+> when no Vercel credential was available and two probes reported `blocked`.
+> Both now pass against a real flag. The current results, and the corrections
+> they forced to the design, are in
+> [`docs/deno-vercel-findings.md`](../../docs/deno-vercel-findings.md).
+>
+> What follows is kept as the record of the credential-free run, which is still
+> the outcome anyone without a Vercel account will see.
+
 Raw results. The summary lives in [`docs/deno-vercel-findings.md`](../../docs/deno-vercel-findings.md);
 this file is the unedited output it is written from.
 

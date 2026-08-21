@@ -38,6 +38,19 @@ enabled = false
 [edge_runtime]
 enabled = true
 
+# Credentials for the Vercel probes, read from the shell environment so nothing
+# secret is committed. Export them before `supabase start`:
+#   set -a; . ./smoke/.env; set +a
+#
+# FLAGS is an SDK key and is the durable option. VERCEL_OIDC_TOKEN works too but
+# expires in about 12 hours, and @vercel/oidc's edge build has no refresh path —
+# it cannot read the Vercel CLI credentials from disk or call api.vercel.com
+# from inside this sandbox. Once it expires the run fails with no recovery.
+[edge_runtime.secrets]
+FLAGS = "env(FLAGS)"
+VERCEL_OIDC_TOKEN = "env(VERCEL_OIDC_TOKEN)"
+SMOKE_FLAG_KEY = "env(SMOKE_FLAG_KEY)"
+
 # The smoke function answers unauthenticated — the gateway's JWT pre-check must
 # not answer first.
 [functions.openfeature-smoke]

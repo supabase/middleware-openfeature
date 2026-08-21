@@ -38,7 +38,15 @@ const edgeConfig = env('EDGE_CONFIG')
 const flagsEnv = env('FLAGS')
 const oidcToken = env('VERCEL_OIDC_TOKEN')
 const flagKey = env('SMOKE_FLAG_KEY')
-const hasCredential = Boolean(edgeConfig || flagsEnv)
+// An SDK key in FLAGS is the durable path. Without one the client falls back to
+// OIDC, which works while VERCEL_OIDC_TOKEN is unexpired — so either counts as
+// a credential. EDGE_CONFIG does not: the default entry point does not read it.
+const hasCredential = Boolean(flagsEnv || oidcToken)
+const authPath = flagsEnv
+  ? 'sdk-key (FLAGS)'
+  : oidcToken
+    ? 'oidc (VERCEL_OIDC_TOKEN)'
+    : 'none'
 
 // ---------------------------------------------------------------------------
 // Probe 1 — does `@openfeature/server-sdk` load on Deno at all?
@@ -170,7 +178,8 @@ if (!hasCredential) {
     name: 'vercel-provider-initializes',
     question: 'Does VercelProvider initialize against a real Edge Config?',
     status: 'blocked',
-    detail: 'Neither EDGE_CONFIG nor FLAGS is set. See smoke/.env.example.',
+    detail:
+      'Neither FLAGS (SDK key) nor VERCEL_OIDC_TOKEN is set. See smoke/.env.example.',
   })
 } else if (typeof VercelProvider !== 'function') {
   record({
@@ -199,9 +208,93 @@ if (!hasCredential) {
 }
 
 // ---------------------------------------------------------------------------
-// Probe 6 — resolve a real flag through the middleware.
+// Probe 5b — find the flag's real type, and get `reason` on the record.
+//
+// This is the probe that tells a real resolution from a silent fallback.
+// `ctx.flags` holds values only, by design, so a type mismatch or a missing
+// flag is indistinguishable from a legitimate value at the handler. `reason` is
+// the only signal:
+//   TARGETING_MATCH / DEFAULT / STATIC -> the provider answered
+//   ERROR + errorCode                  -> it fell back to the declared default
+//
+// The type is probed rather than assumed. Asking for the wrong type returns
+// TYPE_MISMATCH, which is itself a fallback — so guessing boolean and calling
+// the result a pass is exactly the false positive this probe exists to catch.
 // ---------------------------------------------------------------------------
+type Probed = { kind: string; default: unknown; details: any }
+
+async function probeFlagType(key: string): Promise<Probed | null> {
+  const client = OpenFeature.getClient()
+  const attempts: Array<
+    [string, unknown, (k: string, d: any) => Promise<any>]
+  > = [
+    ['boolean', false, (k, d) => client.getBooleanDetails(k, d)],
+    ['string', '', (k, d) => client.getStringDetails(k, d)],
+    ['number', 0, (k, d) => client.getNumberDetails(k, d)],
+    ['object', {}, (k, d) => client.getObjectDetails(k, d)],
+  ]
+  let last: Probed | null = null
+  for (const [kind, def, call] of attempts) {
+    try {
+      const details = await call(key, def)
+      last = { kind, default: def, details }
+      if (details.reason !== 'ERROR') return last
+      if (details.errorCode !== 'TYPE_MISMATCH') return last
+    } catch (error) {
+      last = {
+        kind,
+        default: def,
+        details: { reason: 'ERROR', errorMessage: String(error) },
+      }
+    }
+  }
+  return last
+}
+
+let resolved: Probed | null = null
+
 if (!providerReady || !flagKey) {
+  record({
+    name: 'flag-resolves-with-reason',
+    question: 'Does the provider actually answer, rather than falling back?',
+    status: 'blocked',
+    detail: !flagKey
+      ? 'SMOKE_FLAG_KEY is not set.'
+      : 'Provider did not initialize.',
+  })
+} else {
+  resolved = await probeFlagType(flagKey)
+  const d = resolved?.details
+  const fellBack = !d || d.reason === 'ERROR'
+  record({
+    name: 'flag-resolves-with-reason',
+    question: 'Does the provider actually answer, rather than falling back?',
+    status: fellBack ? 'failed' : 'ok',
+    detail: {
+      flagKey,
+      detectedType: resolved?.kind,
+      value: d?.value,
+      reason: d?.reason,
+      variant: d?.variant,
+      errorCode: d?.errorCode,
+      errorMessage: d?.errorMessage,
+      interpretation: fellBack
+        ? 'FELL BACK to the declared default — the provider did not answer'
+        : `provider answered; flag is a ${resolved?.kind} flag`,
+    },
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Probe 6 — resolve the flag through the middleware, using the type the
+// provider actually reported, so the middleware dispatches to the right method.
+// ---------------------------------------------------------------------------
+if (
+  !providerReady ||
+  !flagKey ||
+  !resolved ||
+  resolved.details?.reason === 'ERROR'
+) {
   record({
     name: 'resolves-real-flag',
     question:
@@ -209,22 +302,37 @@ if (!providerReady || !flagKey) {
     status: 'blocked',
     detail: !flagKey
       ? 'SMOKE_FLAG_KEY is not set.'
-      : 'Provider did not initialize.',
+      : !providerReady
+        ? 'Provider did not initialize.'
+        : 'Flag did not resolve — see flag-resolves-with-reason.',
   })
 } else {
   try {
     const { withOpenFeature } = await import('@supabase/middleware-openfeature')
     const handler = withOpenFeature(
-      { client: OpenFeature.getClient(), flags: { [flagKey]: false } },
+      {
+        client: OpenFeature.getClient(),
+        flags: { [flagKey]: resolved.default as never },
+      },
       async (_req: Request, ctx: any) => Response.json(ctx.flags),
     )
     const res = await handler(new Request('http://localhost/'))
+    const body = await res.json()
+    const matches =
+      JSON.stringify(body[flagKey]) === JSON.stringify(resolved.details.value)
     record({
       name: 'resolves-real-flag',
       question:
         'Does a real Vercel flag resolve through withOpenFeature on Deno?',
-      status: 'ok',
-      detail: { status: res.status, body: await res.json() },
+      status: matches ? 'ok' : 'failed',
+      detail: {
+        status: res.status,
+        body,
+        matchesDirectEvaluation: matches,
+        note: matches
+          ? 'ctx.flags carries the same value the provider returned directly'
+          : 'MISMATCH between ctx.flags and the direct evaluation',
+      },
     })
   } catch (error) {
     record({
@@ -246,6 +354,7 @@ const summary = {
     '@vercel/flags-core': '1.7.1',
     '@supabase/middleware': '0.3.0',
   },
+  authPath,
   credentials: {
     EDGE_CONFIG: Boolean(edgeConfig),
     FLAGS: Boolean(flagsEnv),
