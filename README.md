@@ -58,6 +58,31 @@ Each default's _runtime_ type selects the resolution method:
 All declared flags resolve **concurrently**, so a stack of ten flags costs one
 round trip's latency rather than ten.
 
+### The declared default's type must match the flag's type
+
+This is the one sharp edge. The default you write picks the resolution method,
+so if it disagrees with the flag's type in your provider, the provider returns a
+`TYPE_MISMATCH` error, the flag falls back to your default, and **nothing tells
+you at runtime**:
+
+```ts
+// `theme` is a STRING flag in the provider
+withOpenFeature({ client, flags: { theme: false } }, handler)
+//                                        ^^^^^ boolean
+// ctx.flags.theme === false, with a 200 response and no error anywhere
+```
+
+`ctx.flags` holds values, not details, so a handler cannot tell a real `false`
+from a fallback `false`. That is a deliberate trade — see below — but it means
+a wrong default type fails silently.
+
+If you need to check, ask your OpenFeature client directly and look at `reason`:
+
+```ts
+const details = await client.getBooleanDetails('theme', false)
+details.reason // 'ERROR' with errorCode 'TYPE_MISMATCH' when the type is wrong
+```
+
 ### It never gates
 
 The middleware never short-circuits. An OpenFeature client already returns the
@@ -151,11 +176,14 @@ const client: FlagClient = {
 
 ## Running on Deno and Supabase Edge Functions
 
-This package was smoke-tested against Vercel Flags on both plain Deno and the
-Supabase Edge Runtime. Everything on the Supabase side works — including the
-`sys`/`hostname` permission the Vercel provider needs at module load, which is
-the one thing that could have made the integration impossible. The results,
-including what is still unproven and why, are in
+Verified end to end against a real Vercel flag on **both** plain Deno 2.7.8 and
+the Supabase Edge Runtime 1.74.3. A string flag resolved to its dashboard value
+with `reason: STATIC` and arrived at `ctx.flags` unchanged, on both runtimes.
+
+Two things worth reading before you try it: the provider reads `FLAGS`, not
+`EDGE_CONFIG`, and it needs `sys` access to `"hostname"` at module load. Full
+results, including the OIDC token's 12-hour limit and why an SDK key is the
+better credential, are in
 [`docs/deno-vercel-findings.md`](./docs/deno-vercel-findings.md).
 
 ## Development

@@ -136,20 +136,23 @@ try {
   })
 }
 
-// Probe 5 — credential-gated.
-const hasCredential = Boolean(env('EDGE_CONFIG') || env('FLAGS'))
+// Probe 5 — credential-gated. An SDK key in FLAGS is durable; VERCEL_OIDC_TOKEN
+// works while unexpired. EDGE_CONFIG is not read by the default entry point.
+const hasCredential = Boolean(env('FLAGS') || env('VERCEL_OIDC_TOKEN'))
+let providerReady = false
 if (!hasCredential || typeof VercelProvider !== 'function') {
   probes.push({
     name: 'vercel-provider-initializes',
     question: 'Does VercelProvider initialize against a real Edge Config?',
     status: 'blocked',
     detail: !hasCredential
-      ? 'Neither EDGE_CONFIG nor FLAGS is set in [edge_runtime.secrets].'
+      ? 'Neither FLAGS nor VERCEL_OIDC_TOKEN is set in [edge_runtime.secrets].'
       : 'Provider module did not load — see probe 2.',
   })
 } else {
   try {
     await OpenFeature.setProviderAndWait(new VercelProvider())
+    providerReady = true
     probes.push({
       name: 'vercel-provider-initializes',
       question: 'Does VercelProvider initialize against a real Edge Config?',
@@ -163,6 +166,100 @@ if (!hasCredential || typeof VercelProvider !== 'function') {
       detail: String(error),
     })
   }
+}
+
+// Probe 6 — find the flag's real type and record `reason`. Asking for the wrong
+// type returns TYPE_MISMATCH, which is a fallback wearing a success costume:
+// ctx.flags would carry the declared default and look perfectly healthy.
+const flagKey = env('SMOKE_FLAG_KEY')
+let probed: any = null
+
+if (providerReady && flagKey) {
+  const client = OpenFeature.getClient()
+  const attempts: Array<
+    [string, unknown, (k: string, d: any) => Promise<any>]
+  > = [
+    ['boolean', false, (k, d) => client.getBooleanDetails(k, d)],
+    ['string', '', (k, d) => client.getStringDetails(k, d)],
+    ['number', 0, (k, d) => client.getNumberDetails(k, d)],
+    ['object', {}, (k, d) => client.getObjectDetails(k, d)],
+  ]
+  for (const [kind, def, call] of attempts) {
+    try {
+      const details = await call(flagKey, def)
+      probed = { kind, default: def, details }
+      if (details.reason !== 'ERROR') break
+      if (details.errorCode !== 'TYPE_MISMATCH') break
+    } catch (error) {
+      probed = {
+        kind,
+        default: def,
+        details: { reason: 'ERROR', errorMessage: String(error) },
+      }
+    }
+  }
+  const d = probed?.details
+  const fellBack = !d || d.reason === 'ERROR'
+  probes.push({
+    name: 'flag-resolves-with-reason',
+    question: 'Does the provider actually answer in the edge sandbox?',
+    status: fellBack ? 'failed' : 'ok',
+    detail: {
+      flagKey,
+      detectedType: probed?.kind,
+      value: d?.value,
+      reason: d?.reason,
+      errorCode: d?.errorCode,
+      errorMessage: d?.errorMessage,
+    },
+  })
+} else {
+  probes.push({
+    name: 'flag-resolves-with-reason',
+    question: 'Does the provider actually answer in the edge sandbox?',
+    status: 'blocked',
+    detail: !flagKey
+      ? 'SMOKE_FLAG_KEY is not set.'
+      : 'Provider did not initialize — see vercel-provider-initializes.',
+  })
+}
+
+// Probe 7 — the same flag through the middleware, using the detected type.
+if (probed && probed.details?.reason !== 'ERROR' && flagKey) {
+  try {
+    const { withOpenFeature } = await import('@supabase/middleware-openfeature')
+    const handler = withOpenFeature(
+      { client: OpenFeature.getClient(), flags: { [flagKey]: probed.default } },
+      async (_req: Request, ctx: any) => Response.json(ctx.flags),
+    )
+    const res = await handler(new Request('http://localhost/'))
+    const body = await res.json()
+    const matches =
+      JSON.stringify(body[flagKey]) === JSON.stringify(probed.details.value)
+    probes.push({
+      name: 'resolves-real-flag',
+      question:
+        'Does a real Vercel flag resolve through withOpenFeature in the edge sandbox?',
+      status: matches ? 'ok' : 'failed',
+      detail: { body, matchesDirectEvaluation: matches },
+    })
+  } catch (error) {
+    probes.push({
+      name: 'resolves-real-flag',
+      question:
+        'Does a real Vercel flag resolve through withOpenFeature in the edge sandbox?',
+      status: 'failed',
+      detail: String(error),
+    })
+  }
+} else {
+  probes.push({
+    name: 'resolves-real-flag',
+    question:
+      'Does a real Vercel flag resolve through withOpenFeature in the edge sandbox?',
+    status: 'blocked',
+    detail: 'Flag did not resolve — see flag-resolves-with-reason.',
+  })
 }
 
 const summary = () => ({
