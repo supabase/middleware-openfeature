@@ -134,8 +134,10 @@ no handler and no entry point references the vendored path.
 
 ## Requirements
 
-- `@supabase/server@1.5.0-beta.0` or later for `withClaims`. The published
-  `1.4.1` does not export it under any path.
+- `@supabase/server@1.6.0-beta.0` or later. It is the first release that
+  exports `withClaims` and depends on `@supabase/middleware@^0.5.0`, the same
+  engine range this package uses; an older server pulls a second engine copy
+  into the tree and the two disagree on the `Entry` type.
 - `@openfeature/server-sdk` pinned to exactly `1.18.0` wherever
   `@vercel/flags-core@1.7.1` is installed — it declares that as an exact peer.
 - `@posthog/openfeature-node-provider` is `0.1.0`. Early. Its shape is sound

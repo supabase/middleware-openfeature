@@ -84,3 +84,59 @@ withOpenFeature(
   { client, flags: { a: false } },
   withOpenFeature({ client, flags: { b: false } }, async () => new Response()),
 ) satisfies FetchHandler
+
+import { withSupabase } from '@supabase/server'
+
+const serverEnv = {
+  url: 'https://test.supabase.co',
+  publishableKeys: { default: 'sb_publishable_xyz' },
+  secretKeys: { default: 'sb_secret_xyz' },
+  jwks: null,
+}
+
+// NS1 — the composite keeps its plumbing internal: a third party cannot read
+// `supabaseAuth` off the context `withSupabase` hands down.
+// @expect-error TS2339 Property 'supabaseAuth' does not exist on type
+withSupabase(
+  { auth: 'user', env: serverEnv },
+  withOpenFeature(
+    {
+      client,
+      flags: { a: false },
+      context: (_r, ctx) => ({ targetingKey: ctx.supabaseAuth }),
+    },
+    async () => new Response(),
+  ),
+) satisfies FetchHandler
+
+// NS2 — pipeline form against the real entry: reading the composite's claims
+// in the callback without the annotation is the same documented limit as A7.
+// @expect-error TS2339 Property 'jwtClaims' does not exist on type 'object'
+pipeline(
+  [
+    withSupabase({ auth: 'user', env: serverEnv }),
+    withOpenFeature({
+      client,
+      flags: { a: false },
+      context: (_r, ctx) => ({ targetingKey: ctx.jwtClaims?.sub }),
+    }),
+  ],
+  async (_req, ctx) => Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
+
+// NS3 — nested under `withSupabase` with neither an annotation nor an explicit
+// `Database`, the composite context does not reach the callback (S2 and S2b in
+// positive.ts are the two spellings that work). Pinned so a server release
+// that carries `Base` through shows up here as an unexpected pass.
+// @expect-error TS2339 Property 'authMode' does not exist on type 'object'
+withSupabase(
+  { auth: 'user', env: serverEnv },
+  withOpenFeature(
+    {
+      client,
+      flags: { a: false },
+      context: (_r, ctx) => ({ targetingKey: ctx.authMode }),
+    },
+    async (_req, ctx) => Response.json({ a: ctx.flags.a }),
+  ),
+) satisfies FetchHandler

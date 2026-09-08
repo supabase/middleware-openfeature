@@ -1,0 +1,5 @@
+# wrangler's workerd and esbuild fetch their binaries in a postinstall step,
+# which pnpm blocks unless the package is allowed here.
+allowBuilds:
+  esbuild: true
+  workerd: true
