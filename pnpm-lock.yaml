@@ -12,8 +12,8 @@ importers:
         specifier: ^1.12.0
         version: 1.12.0
       '@supabase/middleware':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.5.0
+        version: 0.5.0(typescript@5.9.3)
     devDependencies:
       '@openfeature/server-sdk':
         specifier: ^1.23.0
@@ -460,9 +460,14 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@supabase/middleware@0.3.0':
-    resolution: {integrity: sha512-JN+dUr7Fyx96jfCUEXpzPEIpmkkogxHfII+fx7wWIiAUFI8C0lObDlzKIqrSVEKiFEK6CMsHWcqRarBQ8azCtw==}
+  '@supabase/middleware@0.5.0':
+    resolution: {integrity: sha512-OjukUo+5p14zxTuylf2zVg1hZCHWKLO6VrZhtVeQQw09yrVo3GAduvFJPiFDhTAz/Du1ZfEzAR+s6aRAWD5wzQ==}
     engines: {node: '>=22'}
+    peerDependencies:
+      typescript: '>=5.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
@@ -1188,9 +1193,11 @@ snapshots:
   '@supabase/cli-windows-x64@2.114.0':
     optional: true
 
-  '@supabase/middleware@0.3.0':
+  '@supabase/middleware@0.5.0(typescript@5.9.3)':
     dependencies:
       std-env: 4.2.0
+    optionalDependencies:
+      typescript: 5.9.3
 
   '@tybys/wasm-util@0.10.3':
     dependencies:
