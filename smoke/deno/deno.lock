@@ -3,7 +3,7 @@
   "specifiers": {
     "npm:@openfeature/core@1.12.0": "1.12.0",
     "npm:@openfeature/server-sdk@1.18.0": "1.18.0_@openfeature+core@1.12.0",
-    "npm:@supabase/middleware@0.3.0": "0.3.0",
+    "npm:@supabase/middleware@0.5.0": "0.5.0",
     "npm:@vercel/flags-core@1.7.1": "1.7.1_@openfeature+server-sdk@1.18.0__@openfeature+core@1.12.0_@openfeature+core@1.12.0"
   },
   "npm": {
@@ -16,8 +16,8 @@
         "@openfeature/core"
       ]
     },
-    "@supabase/middleware@0.3.0": {
-      "integrity": "sha512-JN+dUr7Fyx96jfCUEXpzPEIpmkkogxHfII+fx7wWIiAUFI8C0lObDlzKIqrSVEKiFEK6CMsHWcqRarBQ8azCtw==",
+    "@supabase/middleware@0.5.0": {
+      "integrity": "sha512-OjukUo+5p14zxTuylf2zVg1hZCHWKLO6VrZhtVeQQw09yrVo3GAduvFJPiFDhTAz/Du1ZfEzAR+s6aRAWD5wzQ==",
       "dependencies": [
         "std-env"
       ]
@@ -178,7 +178,7 @@
     "dependencies": [
       "npm:@openfeature/core@1.12.0",
       "npm:@openfeature/server-sdk@1.18.0",
-      "npm:@supabase/middleware@0.3.0",
+      "npm:@supabase/middleware@0.5.0",
       "npm:@vercel/flags-core@1.7.1"
     ]
   }

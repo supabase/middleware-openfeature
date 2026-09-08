@@ -10,7 +10,11 @@
  * @packageDocumentation
  */
 
-import type { BaseContext, Entry, NoConflict } from '@supabase/middleware'
+import type {
+  BaseContext,
+  NoConflict,
+  SingleKeyEntry,
+} from '@supabase/middleware'
 
 import { withOpenFeatureRuntime } from './with-open-feature.js'
 import type { FlagDefaults, Resolved, WithOpenFeatureConfig } from './types.js'
@@ -116,7 +120,7 @@ export interface WithOpenFeature {
   // `NoInfer` closes it.
   <F extends FlagDefaults, Base extends BaseContext = BaseContext>(
     config: WithOpenFeatureConfig<F, Base>,
-  ): Entry<'flags', Record<never, never>, Resolved<F>>
+  ): SingleKeyEntry<'flags', Record<never, never>, Resolved<F>>
 }
 
 /**
