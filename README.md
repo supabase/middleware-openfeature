@@ -1,4 +1,4 @@
-# `@supabase/middleware-openfeature`
+# `@supabase-labs/middleware-openfeature`
 
 Typed [OpenFeature](https://openfeature.dev) flag resolution as a
 [`@supabase/middleware`](https://github.com/supabase/middleware) middleware.
@@ -9,7 +9,7 @@ client, and every declared flag is resolved concurrently per request and lands a
 
 ```ts
 import { OpenFeature } from '@openfeature/server-sdk'
-import { withOpenFeature } from '@supabase/middleware-openfeature'
+import { withOpenFeature } from '@supabase-labs/middleware-openfeature'
 
 const client = OpenFeature.getClient()
 
@@ -29,7 +29,7 @@ export default {
 ## Install
 
 ```bash
-npm install @supabase/middleware-openfeature @openfeature/server-sdk
+npm install @supabase-labs/middleware-openfeature @openfeature/server-sdk
 ```
 
 `@openfeature/server-sdk` is **yours, not ours**. This package depends only on
@@ -164,7 +164,7 @@ differs.
 and anything else can implement it directly:
 
 ```ts
-import type { FlagClient } from '@supabase/middleware-openfeature'
+import type { FlagClient } from '@supabase-labs/middleware-openfeature'
 
 const client: FlagClient = {
   async getBooleanDetails(flagKey, defaultValue) {

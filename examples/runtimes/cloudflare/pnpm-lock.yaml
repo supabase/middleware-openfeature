@@ -14,12 +14,12 @@ importers:
       '@posthog/openfeature-node-provider':
         specifier: ^0.1.0
         version: 0.1.0(@openfeature/core@1.12.0)(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))(posthog-node@5.49.0)
+      '@supabase-labs/middleware-openfeature':
+        specifier: file:./vendor/middleware-openfeature.tgz
+        version: file:vendor/middleware-openfeature.tgz
       '@supabase/middleware':
         specifier: ^0.5.0
         version: 0.5.0
-      '@supabase/middleware-openfeature':
-        specifier: file:./vendor/middleware-openfeature.tgz
-        version: file:vendor/middleware-openfeature.tgz
       '@supabase/server':
         specifier: 1.6.0-beta.0
         version: 1.6.0-beta.0(@supabase/supabase-js@2.112.3)
@@ -453,16 +453,8 @@ packages:
   '@speed-highlight/core@1.2.24':
     resolution: {integrity: sha512-qeW2e1l78afw8VhRPfPQ1Gjj+KU5XFQ/OFV5ti6eTa9bruO7mJyZtA4vw0ofqmA3tKCkROE9xLk3VZoeRc98nw==}
 
-  '@supabase/auth-js@2.112.3':
-    resolution: {integrity: sha512-NA0rsgAlWZPvbhw8aUdmgfpHVgUAcd8zK5ov43l++o1bLIPXZhRiAlRobhwF5AatQuovpqxsMH50F4oyyV4XZw==}
-    engines: {node: '>=22.0.0'}
-
-  '@supabase/functions-js@2.112.3':
-    resolution: {integrity: sha512-gfv481mTOVWtZIJgXupxZpni2V2UWPf6jeF/jOK7HdMHdH+mt6sU0sHHwf0POsPip8ltlulu9OUHgwVzl5ddRw==}
-    engines: {node: '>=22.0.0'}
-
-  '@supabase/middleware-openfeature@file:vendor/middleware-openfeature.tgz':
-    resolution: {integrity: sha512-onXUyZwsohZvUb3txMv0ObvsMZdNWgJKVaMd3CFvFnXehD3XvOzPJUoTS/EPg4rBtBMXcxmlRzFxY3UsXgkKVw==, tarball: file:vendor/middleware-openfeature.tgz}
+  '@supabase-labs/middleware-openfeature@file:vendor/middleware-openfeature.tgz':
+    resolution: {integrity: sha512-XBhpsvXUr5SbJX8LIE7j7HovNmcO+AfXfq5Om0GfbIwM4clQ6yeUuBnZ2I0BLn2z/Szhy9sWGrL0N6SA47hNNw==, tarball: file:vendor/middleware-openfeature.tgz}
     version: 0.1.0
     engines: {node: '>=22'}
     peerDependencies:
@@ -470,6 +462,14 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  '@supabase/auth-js@2.112.3':
+    resolution: {integrity: sha512-NA0rsgAlWZPvbhw8aUdmgfpHVgUAcd8zK5ov43l++o1bLIPXZhRiAlRobhwF5AatQuovpqxsMH50F4oyyV4XZw==}
+    engines: {node: '>=22.0.0'}
+
+  '@supabase/functions-js@2.112.3':
+    resolution: {integrity: sha512-gfv481mTOVWtZIJgXupxZpni2V2UWPf6jeF/jOK7HdMHdH+mt6sU0sHHwf0POsPip8ltlulu9OUHgwVzl5ddRw==}
+    engines: {node: '>=22.0.0'}
 
   '@supabase/middleware@0.5.0':
     resolution: {integrity: sha512-OjukUo+5p14zxTuylf2zVg1hZCHWKLO6VrZhtVeQQw09yrVo3GAduvFJPiFDhTAz/Du1ZfEzAR+s6aRAWD5wzQ==}
@@ -1025,6 +1025,11 @@ snapshots:
 
   '@speed-highlight/core@1.2.24': {}
 
+  '@supabase-labs/middleware-openfeature@file:vendor/middleware-openfeature.tgz':
+    dependencies:
+      '@openfeature/core': 1.12.0
+      '@supabase/middleware': 0.5.0
+
   '@supabase/auth-js@2.112.3':
     dependencies:
       tslib: 2.8.1
@@ -1032,11 +1037,6 @@ snapshots:
   '@supabase/functions-js@2.112.3':
     dependencies:
       tslib: 2.8.1
-
-  '@supabase/middleware-openfeature@file:vendor/middleware-openfeature.tgz':
-    dependencies:
-      '@openfeature/core': 1.12.0
-      '@supabase/middleware': 0.5.0
 
   '@supabase/middleware@0.5.0':
     dependencies:

@@ -1,6 +1,6 @@
 import type { FetchHandler } from '@supabase/middleware'
-import { withOpenFeature } from '@supabase/middleware-openfeature'
-import type { FlagClient } from '@supabase/middleware-openfeature'
+import { withOpenFeature } from '@supabase-labs/middleware-openfeature'
+import type { FlagClient } from '@supabase-labs/middleware-openfeature'
 
 /**
  * The flags this handler reads, and their defaults.

@@ -1,5 +1,5 @@
 /**
- * `@supabase/middleware-openfeature` — typed OpenFeature flag resolution for
+ * `@supabase-labs/middleware-openfeature` — typed OpenFeature flag resolution for
  * `@supabase/middleware`.
  *
  * Declare your flags with their mandatory defaults, hand it any OpenFeature
@@ -9,7 +9,7 @@
  * @example
  * ```ts
  * import { OpenFeature } from '@openfeature/server-sdk'
- * import { withOpenFeature } from '@supabase/middleware-openfeature'
+ * import { withOpenFeature } from '@supabase-labs/middleware-openfeature'
  *
  * const client = OpenFeature.getClient()
  *

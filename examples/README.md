@@ -112,7 +112,7 @@ assumed.
 
 ## Before the package is published
 
-`@supabase/middleware-openfeature` is not on npm yet, so the examples cannot
+`@supabase-labs/middleware-openfeature` is not on npm yet, so the examples cannot
 depend on it by version. They also cannot use `link:` to the repo root: Vercel
 and Cloudflare upload only the directory you deploy, and a symlink pointing
 above that directory does not survive the upload.

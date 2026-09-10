@@ -1,5 +1,5 @@
 {
-  "name": "@supabase/middleware-openfeature-examples",
+  "name": "@supabase-labs/middleware-openfeature-examples",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "@openfeature/server-sdk": "1.18.0",
     "@posthog/openfeature-node-provider": "^0.1.0",
     "@supabase/middleware": "^0.5.0",
-    "@supabase/middleware-openfeature": "link:..",
+    "@supabase-labs/middleware-openfeature": "link:..",
     "@supabase/server": "1.6.0-beta.0",
     "@vercel/flags-core": "^1.7.1",
     "posthog-node": "5.49.0"

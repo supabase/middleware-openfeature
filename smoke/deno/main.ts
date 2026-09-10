@@ -122,11 +122,12 @@ try {
 // ---------------------------------------------------------------------------
 // Probe 4 — does this package's own middleware run on Deno, end to end?
 // Uses a hand-rolled FlagClient, so it needs no Vercel account. This isolates
-// "does @supabase/middleware-openfeature work on Deno" from "does Vercel Flags
+// "does @supabase-labs/middleware-openfeature work on Deno" from "does Vercel Flags
 // work on Deno", which the design doc treats as a single question.
 // ---------------------------------------------------------------------------
 try {
-  const { withOpenFeature } = await import('@supabase/middleware-openfeature')
+  const { withOpenFeature } =
+    await import('@supabase-labs/middleware-openfeature')
   const stub = {
     getBooleanDetails: async (k: string, d: boolean) => ({
       flagKey: k,
@@ -154,7 +155,7 @@ try {
   record({
     name: 'middleware-runs-on-deno',
     question:
-      'Does @supabase/middleware-openfeature itself resolve flags on Deno?',
+      'Does @supabase-labs/middleware-openfeature itself resolve flags on Deno?',
     status:
       body.betaCheckout === true && body.theme === 'light' ? 'ok' : 'failed',
     detail: { status: res.status, body },
@@ -163,7 +164,7 @@ try {
   record({
     name: 'middleware-runs-on-deno',
     question:
-      'Does @supabase/middleware-openfeature itself resolve flags on Deno?',
+      'Does @supabase-labs/middleware-openfeature itself resolve flags on Deno?',
     status: 'failed',
     detail: String(error),
   })
@@ -308,7 +309,8 @@ if (
   })
 } else {
   try {
-    const { withOpenFeature } = await import('@supabase/middleware-openfeature')
+    const { withOpenFeature } =
+      await import('@supabase-labs/middleware-openfeature')
     const handler = withOpenFeature(
       {
         client: OpenFeature.getClient(),

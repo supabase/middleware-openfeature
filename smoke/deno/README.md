@@ -67,7 +67,7 @@ pnpm smoke:deno
     },
     {
       "name": "middleware-runs-on-deno",
-      "question": "Does @supabase/middleware-openfeature itself resolve flags on Deno?",
+      "question": "Does @supabase-labs/middleware-openfeature itself resolve flags on Deno?",
       "status": "ok",
       "detail": {
         "status": 200,

@@ -13,26 +13,22 @@ importers:
         version: 1.18.0(@openfeature/core@1.12.0)
       '@posthog/openfeature-node-provider':
         specifier: ^0.1.0
-        version: 0.1.0(@openfeature/core@1.12.0)(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))(posthog-node@5.49.0)
+        version: 0.1.1(@openfeature/core@1.12.0)(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))(posthog-node@5.49.0)
+      '@supabase-labs/middleware-openfeature':
+        specifier: file:./vendor/middleware-openfeature.tgz
+        version: file:vendor/middleware-openfeature.tgz
       '@supabase/middleware':
         specifier: ^0.5.0
-        version: 0.5.0(typescript@5.9.3)
-      '@supabase-labs/middleware-openfeature':
-        specifier: link:..
-        version: link:..
+        version: 0.5.0
       '@supabase/server':
         specifier: 1.6.0-beta.0
-        version: 1.6.0-beta.0(@supabase/supabase-js@2.112.3)(typescript@5.9.3)
+        version: 1.6.0-beta.0(@supabase/supabase-js@2.116.0)
       '@vercel/flags-core':
         specifier: ^1.7.1
-        version: 1.7.1(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))
+        version: 1.8.0(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))
       posthog-node:
         specifier: 5.49.0
         version: 5.49.0
-    devDependencies:
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
 
 packages:
 
@@ -45,26 +41,36 @@ packages:
     peerDependencies:
       '@openfeature/core': ^1.7.0
 
-  '@posthog/core@1.48.0':
-    resolution: {integrity: sha512-ezKjVLw9y3Q235PUY+2hRr5DN9t6j2jF1mFAvnvhCCu/Ha6/qBv3zmVJBaHu9PnqqSNtx2St3ggN8Z3TTu/12A==}
+  '@posthog/core@1.51.0':
+    resolution: {integrity: sha512-LilmmtjcrjV1LgaVNQXrAUt4IXcWIYMrwEtx6VJUUFDeBBdmeI99jshKGtAWugYeB3Wkcp9xQIVCrxIYRpNiRA==}
 
-  '@posthog/openfeature-node-provider@0.1.0':
-    resolution: {integrity: sha512-nH+761leI9/d1RRuHjju2hDmXJSVt0meOPdBgf/EEoojeqavfR4eeRDVw4WZZJyD6BzYRUq1cvuIGgHmI91IBw==}
+  '@posthog/openfeature-node-provider@0.1.1':
+    resolution: {integrity: sha512-NxUgYO9DD2aIiO1WYO/6fpUDszBEfBnchlju/Nl+VZYted2uPq/vWGCNrEG/U3P/QTypS7+OiC8NHX2G0fCH8Q==}
     engines: {node: ^20.20.0 || >=22.22.0}
     peerDependencies:
       '@openfeature/core': ^1.11.0
       '@openfeature/server-sdk': ^1.17.0
       posthog-node: '>=5.21.2'
 
-  '@posthog/types@1.404.0':
-    resolution: {integrity: sha512-/Y1zKv8SdwkK725SkmgT5QVYnXE7Fi23SPDCZ5Ybu27gTQub4yMTKWuUQekW+gkSKBZ0LyYCQK52mhyMMigMBw==}
+  '@posthog/types@1.409.1':
+    resolution: {integrity: sha512-lA2sSGQUdVknSQl93uN9eUXDwkCMjAuthq24GONGHzMWwVygsKNHlWCnlJsVv2giDokj2p1NopO4zsE2S7gYjA==}
 
-  '@supabase/auth-js@2.112.3':
-    resolution: {integrity: sha512-NA0rsgAlWZPvbhw8aUdmgfpHVgUAcd8zK5ov43l++o1bLIPXZhRiAlRobhwF5AatQuovpqxsMH50F4oyyV4XZw==}
+  '@supabase-labs/middleware-openfeature@file:vendor/middleware-openfeature.tgz':
+    resolution: {integrity: sha512-XBhpsvXUr5SbJX8LIE7j7HovNmcO+AfXfq5Om0GfbIwM4clQ6yeUuBnZ2I0BLn2z/Szhy9sWGrL0N6SA47hNNw==, tarball: file:vendor/middleware-openfeature.tgz}
+    version: 0.1.0
+    engines: {node: '>=22'}
+    peerDependencies:
+      typescript: '>=5.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@supabase/auth-js@2.116.0':
+    resolution: {integrity: sha512-Cmosty12gyKGK9N3bQb+lMmuAFev5nmUzaR1AsmZHqKOAGzqX1VQzmp49CNPwOx/pw0H9Qqk4rs9yhwTlKpfDg==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/functions-js@2.112.3':
-    resolution: {integrity: sha512-gfv481mTOVWtZIJgXupxZpni2V2UWPf6jeF/jOK7HdMHdH+mt6sU0sHHwf0POsPip8ltlulu9OUHgwVzl5ddRw==}
+  '@supabase/functions-js@2.116.0':
+    resolution: {integrity: sha512-E+VOc2QDcni/fySqkBFiZhnoB3SGydEdZgFI6/dEAGAHx6yEhB46TN9qb2wXs+E+RSzOBV0R6dasiSlw4xlZAA==}
     engines: {node: '>=22.0.0'}
 
   '@supabase/middleware@0.5.0':
@@ -79,12 +85,12 @@ packages:
   '@supabase/phoenix@0.4.5':
     resolution: {integrity: sha512-aAn9H9ovVyeApKy11OWOrrOGq8DV68yWeH4ud2lN9fzn4aO8Zb5GLL9m1pUg9nLqIcT+ZDfAcsZe0E/nqdv2lw==}
 
-  '@supabase/postgrest-js@2.112.3':
-    resolution: {integrity: sha512-+Mf6uCpzr00bqxwX8hTK2X2L9eAL/1vuOjdEjx6upz9ulb0RmQT16XeU/JkMUlVHw/B46ZnPa2busY4Kd9YCzw==}
+  '@supabase/postgrest-js@2.116.0':
+    resolution: {integrity: sha512-kGpVZTDHxFTJS3tu+rU0iTAZ+4U0bcLVjxwCk8f3gRhjw3qdCZjTBlgYvc4kGH2XccmAzbkKwXL/mrNHMGSc+A==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/realtime-js@2.112.3':
-    resolution: {integrity: sha512-E6wljXWs7DUOloyIB69i3YFInWE6IyCvgTAbQ0KYxOHv26FdA1KzEXTuzxrYEdf70t406Z9BRwUlGyclGF2FXA==}
+  '@supabase/realtime-js@2.116.0':
+    resolution: {integrity: sha512-MHAnlXxi2s6yiJsZsQMfs2B3RFxeVfQWxerqYhIMqcCQV/FuY3LIeouPEkXw/ah7wUWMLYwempF9MOCUScyddg==}
     engines: {node: '>=22.0.0'}
 
   '@supabase/server@1.6.0-beta.0':
@@ -109,12 +115,12 @@ packages:
       pg:
         optional: true
 
-  '@supabase/storage-js@2.112.3':
-    resolution: {integrity: sha512-oSK61tzlUvg+BWPqpKQCu9qqonsO26btaoAR9D6Gest2aj7xUqToj9rKyaoYOJczkhg9BjqA1REbYy9tPI4bDA==}
+  '@supabase/storage-js@2.116.0':
+    resolution: {integrity: sha512-6/3hR6vccBP6oGM5B6RfbwZcTCKmQOodd/ZWQdsw8yJsU5zO/a//oBL6yLnmgxcjnHSrelW8rsO7hL5DPybyUQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/supabase-js@2.112.3':
-    resolution: {integrity: sha512-Jv1bxVQmEJNkjvPEhFaKjPzsh+Ozyew6lWGD+SoYcsclDEP1z7yEvKvfUQfzy0DkxRIQnZNxmmWtAzw5XLTQoA==}
+  '@supabase/supabase-js@2.116.0':
+    resolution: {integrity: sha512-YyWmKXt2NspV9iO8FPnlswUFJIRnrLd3oTCb+3ZyYRuKZtBH0xCUDgnUqoyA0fGUxpM/UhfwDjYf/dht/9bp7g==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0'
@@ -122,15 +128,15 @@ packages:
       '@opentelemetry/api':
         optional: true
 
-  '@vercel/cli-config@0.2.3':
-    resolution: {integrity: sha512-Ggh0Wmi92TUkUexmSUPkkDtvJmbjUr7IvF5T3FkSsWrXXs3GFzOujfxFpECdJZpux1JG4SWDv9BT4w++TDgD6A==}
+  '@vercel/cli-config@0.2.4':
+    resolution: {integrity: sha512-kZ5SojbrV06GHoU6QIWGwDXLov+s9rWZ7QqdqKfJfBGCNUieGfgaCjeeenNy8Y+QC0bwC0dZ2B4l5Hvdmrgpdw==}
 
   '@vercel/cli-exec@1.0.1':
     resolution: {integrity: sha512-g9XerViJ/paZujufXYcu5XYI2vU2rtB4sgdpjUHde5RnOkdmpu0ngH46LCFGHoPXO/C+qDPSczIHIRN+8Q2YKQ==}
     engines: {node: '>= 18'}
 
-  '@vercel/flags-core@1.7.1':
-    resolution: {integrity: sha512-Fzm/+ubwxjEjhdGC8RXp+maQzjRFCNCPbXuxHd75v1tKllya45+gYRhc71HHqIVuteVWkdaYAdRdi+ytwaShiQ==}
+  '@vercel/flags-core@1.8.0':
+    resolution: {integrity: sha512-cBB1RMoKmWJ0oy8VCVPx3GVzkWRL3oV26SsYlZ25V0TDB5/icJ2121k5ZAPVw5phoqM/YiBh6nvKUqMERZ6u4Q==}
     peerDependencies:
       '@openfeature/server-sdk': 1.18.0
       next: '*'
@@ -140,8 +146,8 @@ packages:
       next:
         optional: true
 
-  '@vercel/functions@3.9.3':
-    resolution: {integrity: sha512-cbzTdASCZDnufrABc8oO00e/FqlqFFSdld+iGZPhrWBDHP4Pu8ESKKYIzASqYvbYYUIWujBvEa5LLCcZzm7WEw==}
+  '@vercel/functions@3.9.5':
+    resolution: {integrity: sha512-EUfqlb7AzoEh7URlMNAO4jbJiLWz9grDBHvfjKTDvEP9c8y3DqX3SWPvfaQkUjtkm3b83flhaUUMuewdHa+qmw==}
     engines: {node: '>= 20'}
     peerDependencies:
       '@aws-sdk/credential-provider-web-identity': '*'
@@ -156,8 +162,8 @@ packages:
     resolution: {integrity: sha512-jo7GgeJx2YMkjg9A28pFM5p88n5SnSHvDeNlf9898bRWiG9jPxwedj/gn/2XTw4UOTyQ50uHlrTGSlf/XU5tgw==}
     engines: {node: '>= 20'}
 
-  '@vercel/oidc@3.8.4':
-    resolution: {integrity: sha512-FGNvVZ5pgX9FaBqkPt6VkYFZ6bWAMDzYi7nxW+1Xt+Z4fn5PuTULVwsxjKc+0uKhysyWBQmvsmM50Oh6C2/oMA==}
+  '@vercel/oidc@3.8.5':
+    resolution: {integrity: sha512-RwXYtnt6za+5UO4IaLywN/6B95AlLqynPRUWRJxeJ/qufwkcLUbZNUxYtzT0uMpuraWhlNcGqPNGkTnZr4BGBw==}
     engines: {node: '>= 20'}
 
   cross-spawn@7.0.6:
@@ -193,8 +199,8 @@ packages:
   jose@5.2.1:
     resolution: {integrity: sha512-qiaQhtQRw6YrOaOj0v59h3R6hUY9NvxBmmnMfKemkqYmBB0tEc97NbLP7ix44VP5p9/0YHG8Vyhzuo5YBNwviA==}
 
-  jose@6.2.8:
-    resolution: {integrity: sha512-Bsdjwm3Qsd/P0jR+BHDe3LytDfY7WBq2HmCCLIwuVRHMuEC9ae7/R474GIUdF1NgCyZjzVo/A9DOiOBtXq8ZoQ==}
+  jose@6.2.12:
+    resolution: {integrity: sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==}
 
   js-xxhash@4.0.0:
     resolution: {integrity: sha512-3Q2eIqG6s1KEBBmkj9tGM9lef8LJbuRyTVBdI3GpTnrvtytunjLPO0wqABp5qhtMzfA32jYn1FlnIV7GH1RAHQ==}
@@ -253,11 +259,6 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
@@ -282,65 +283,68 @@ snapshots:
     dependencies:
       '@openfeature/core': 1.12.0
 
-  '@posthog/core@1.48.0':
+  '@posthog/core@1.51.0':
     dependencies:
-      '@posthog/types': 1.404.0
+      '@posthog/types': 1.409.1
 
-  '@posthog/openfeature-node-provider@0.1.0(@openfeature/core@1.12.0)(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))(posthog-node@5.49.0)':
+  '@posthog/openfeature-node-provider@0.1.1(@openfeature/core@1.12.0)(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))(posthog-node@5.49.0)':
     dependencies:
       '@openfeature/core': 1.12.0
       '@openfeature/server-sdk': 1.18.0(@openfeature/core@1.12.0)
       posthog-node: 5.49.0
 
-  '@posthog/types@1.404.0': {}
+  '@posthog/types@1.409.1': {}
 
-  '@supabase/auth-js@2.112.3':
+  '@supabase-labs/middleware-openfeature@file:vendor/middleware-openfeature.tgz':
+    dependencies:
+      '@openfeature/core': 1.12.0
+      '@supabase/middleware': 0.5.0
+
+  '@supabase/auth-js@2.116.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/functions-js@2.112.3':
+  '@supabase/functions-js@2.116.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/middleware@0.5.0(typescript@5.9.3)':
+  '@supabase/middleware@0.5.0':
     dependencies:
       std-env: 4.2.0
-    optionalDependencies:
-      typescript: 5.9.3
 
   '@supabase/phoenix@0.4.5': {}
 
-  '@supabase/postgrest-js@2.112.3':
+  '@supabase/postgrest-js@2.116.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/realtime-js@2.112.3':
+  '@supabase/realtime-js@2.116.0':
     dependencies:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/server@1.6.0-beta.0(@supabase/supabase-js@2.112.3)(typescript@5.9.3)':
+  '@supabase/server@1.6.0-beta.0(@supabase/supabase-js@2.116.0)':
     dependencies:
-      '@supabase/middleware': 0.5.0(typescript@5.9.3)
-      '@supabase/supabase-js': 2.112.3
-      jose: 6.2.8
+      '@supabase/middleware': 0.5.0
+      '@supabase/supabase-js': 2.116.0
+      jose: 6.2.12
     transitivePeerDependencies:
       - typescript
 
-  '@supabase/storage-js@2.112.3':
+  '@supabase/storage-js@2.116.0':
     dependencies:
       iceberg-js: 0.8.1
       tslib: 2.8.1
 
-  '@supabase/supabase-js@2.112.3':
+  '@supabase/supabase-js@2.116.0':
     dependencies:
-      '@supabase/auth-js': 2.112.3
-      '@supabase/functions-js': 2.112.3
-      '@supabase/postgrest-js': 2.112.3
-      '@supabase/realtime-js': 2.112.3
-      '@supabase/storage-js': 2.112.3
+      '@supabase/auth-js': 2.116.0
+      '@supabase/functions-js': 2.116.0
+      '@supabase/postgrest-js': 2.116.0
+      '@supabase/realtime-js': 2.116.0
+      '@supabase/storage-js': 2.116.0
 
-  '@vercel/cli-config@0.2.3':
+  '@vercel/cli-config@0.2.4':
     dependencies:
       xdg-app-paths: 5.5.1
       zod: 4.1.11
@@ -349,9 +353,9 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/flags-core@1.7.1(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))':
+  '@vercel/flags-core@1.8.0(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))':
     dependencies:
-      '@vercel/functions': 3.9.3
+      '@vercel/functions': 3.9.5
       '@vercel/oidc': 3.5.0
       jose: 5.2.1
       js-xxhash: 4.0.0
@@ -361,15 +365,15 @@ snapshots:
       - '@aws-sdk/credential-provider-web-identity'
       - ws
 
-  '@vercel/functions@3.9.3':
+  '@vercel/functions@3.9.5':
     dependencies:
-      '@vercel/oidc': 3.8.4
+      '@vercel/oidc': 3.8.5
 
   '@vercel/oidc@3.5.0': {}
 
-  '@vercel/oidc@3.8.4':
+  '@vercel/oidc@3.8.5':
     dependencies:
-      '@vercel/cli-config': 0.2.3
+      '@vercel/cli-config': 0.2.4
       '@vercel/cli-exec': 1.0.1
       jose: 5.10.0
 
@@ -405,7 +409,7 @@ snapshots:
 
   jose@5.2.1: {}
 
-  jose@6.2.8: {}
+  jose@6.2.12: {}
 
   js-xxhash@4.0.0: {}
 
@@ -427,7 +431,7 @@ snapshots:
 
   posthog-node@5.49.0:
     dependencies:
-      '@posthog/core': 1.48.0
+      '@posthog/core': 1.51.0
 
   shebang-command@2.0.0:
     dependencies:
@@ -442,8 +446,6 @@ snapshots:
   strip-final-newline@2.0.0: {}
 
   tslib@2.8.1: {}
-
-  typescript@5.9.3: {}
 
   which@2.0.2:
     dependencies:

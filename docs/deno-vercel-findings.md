@@ -2,7 +2,7 @@
 
 **Question:** does `VercelProvider` from `@vercel/flags-core/openfeature` resolve
 a real flag on the Deno runtime that Supabase Edge Functions use, when driven
-through `@supabase/middleware-openfeature`?
+through `@supabase-labs/middleware-openfeature`?
 
 **Date:** 2026-08-20 · **Answer: yes, on both runtimes, against a real flag.**
 
@@ -12,17 +12,17 @@ at `ctx.flags.theme` unchanged.
 
 ## What was tested
 
-|                                    |                                                                                  |
-| ---------------------------------- | -------------------------------------------------------------------------------- |
-| Run 1                              | plain `deno run`, Deno 2.7.8                                                     |
-| Run 2                              | Supabase Edge Runtime 1.74.3 (Deno 2.1.4), local stack, through the Kong gateway |
-| Supabase CLI                       | 2.114.0                                                                          |
-| `@vercel/flags-core`               | 1.7.1                                                                            |
-| `@openfeature/server-sdk`          | 1.18.0 — pinned, see "the forced peer version" below                             |
-| `@openfeature/core`                | 1.12.0                                                                           |
-| `@supabase/middleware`             | 0.3.0                                                                            |
-| `@supabase/middleware-openfeature` | 0.1.0, packed with `pnpm pack` for run 2                                         |
-| Credential                         | `VERCEL_OIDC_TOKEN` from `vercel env pull`                                       |
+|                                         |                                                                                  |
+| --------------------------------------- | -------------------------------------------------------------------------------- |
+| Run 1                                   | plain `deno run`, Deno 2.7.8                                                     |
+| Run 2                                   | Supabase Edge Runtime 1.74.3 (Deno 2.1.4), local stack, through the Kong gateway |
+| Supabase CLI                            | 2.114.0                                                                          |
+| `@vercel/flags-core`                    | 1.7.1                                                                            |
+| `@openfeature/server-sdk`               | 1.18.0 — pinned, see "the forced peer version" below                             |
+| `@openfeature/core`                     | 1.12.0                                                                           |
+| `@supabase/middleware`                  | 0.3.0                                                                            |
+| `@supabase-labs/middleware-openfeature` | 0.1.0, packed with `pnpm pack` for run 2                                         |
+| Credential                              | `VERCEL_OIDC_TOKEN` from `vercel env pull`                                       |
 
 Run 2 imports the package after `pnpm pack`, so it exercises the exact files
 `npm publish` would ship.
@@ -156,7 +156,7 @@ So an expired token inside an Edge Function is a hard failure with no recovery.
 An exact version, not a range. Installing it beside `1.23.0` fails with
 `Conflicting peer dependency`.
 
-This is not a problem for `@supabase/middleware-openfeature`, which depends on
+This is not a problem for `@supabase-labs/middleware-openfeature`, which depends on
 neither: it accepts the client structurally and imports types only from
 `@openfeature/core`. The same build ran against 1.18.0 here and against 1.23.0 in
 the type tests and the TypeScript floor fixture, with no conditional code. The
@@ -221,7 +221,7 @@ No polyfills, no compatibility flags, no forks.
     },
     {
       "name": "middleware-runs-on-deno",
-      "question": "Does @supabase/middleware-openfeature itself resolve flags on Deno?",
+      "question": "Does @supabase-labs/middleware-openfeature itself resolve flags on Deno?",
       "status": "ok",
       "detail": {
         "status": 200,
@@ -297,7 +297,7 @@ No polyfills, no compatibility flags, no forks.
     },
     {
       "name": "middleware-runs-in-edge-sandbox",
-      "question": "Does @supabase/middleware-openfeature resolve flags in the edge sandbox?",
+      "question": "Does @supabase-labs/middleware-openfeature resolve flags in the edge sandbox?",
       "status": "ok",
       "detail": {
         "status": 200,

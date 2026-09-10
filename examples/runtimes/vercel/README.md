@@ -1,6 +1,6 @@
 # Vercel Functions
 
-> **Run `../../vendor.sh` first.** Until `@supabase/middleware-openfeature` is
+> **Run `../../vendor.sh` first.** Until `@supabase-labs/middleware-openfeature` is
 > published, this example depends on a packed copy at
 > `vendor/middleware-openfeature.tgz`. It cannot use `link:` to the repo root:
 > both Vercel and Cloudflare upload only the directory you deploy, so a symlink

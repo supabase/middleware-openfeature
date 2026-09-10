@@ -1,7 +1,7 @@
 import { OpenFeature } from '@openfeature/server-sdk'
 import { PostHogServerProvider } from '@posthog/openfeature-node-provider'
 import { PostHog } from 'posthog-node/edge'
-import type { FlagClient } from '@supabase/middleware-openfeature'
+import type { FlagClient } from '@supabase-labs/middleware-openfeature'
 
 /** The environment {@link createPostHogFlagClient} needs. */
 export interface PostHogEnv {

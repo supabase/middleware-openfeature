@@ -24,12 +24,12 @@ rm "$tarball"
 # Supabase CLI >= 2.110 scans import specifiers out of JSDoc comments too, and
 # aborts `supabase start` when one does not resolve. Our published JSDoc carries
 # `@example` blocks importing '@openfeature/server-sdk' and
-# '@supabase/middleware-openfeature'. Both ARE mapped in the function's
+# '@supabase-labs/middleware-openfeature'. Both ARE mapped in the function's
 # deno.json, so they resolve — but neutralize any subpath specifier on a comment
 # line anyway, which is the shape that breaks the scanner (see the identical
 # workaround in @supabase/server's e2e/scripts/vendor-pack.sh).
 find "$vendor_dir/package/dist" -type f \( -name '*.js' -o -name '*.d.ts' \) \
-  -exec sed -i.bak "/^[[:space:]]*\*/ s|'@supabase/middleware-openfeature/[^']*'|'@supabase/middleware-openfeature'|g" {} + \
+  -exec sed -i.bak "/^[[:space:]]*\*/ s|'@supabase-labs/middleware-openfeature/[^']*'|'@supabase-labs/middleware-openfeature'|g" {} + \
   && find "$vendor_dir/package/dist" -name '*.bak' -delete
 
 echo "Vendored $(basename "$tarball") -> ${vendor_dir#"$repo_root/"}/package"
