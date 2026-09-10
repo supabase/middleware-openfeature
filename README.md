@@ -214,14 +214,15 @@ as a dogfooding exercise. Every place the guide fell short is recorded in
 
 ## Releases
 
-**Not automated yet.** The package is not published to npm, and there is no
-release workflow.
+Releases are automated with [release-please](https://github.com/googleapis/release-please).
+Conventional commits merged to `main` accumulate into a release PR; merging
+that PR publishes to npm via OIDC trusted publishing, with no token stored in
+the repo.
 
-When it is time to publish, `@supabase/middleware`'s own
-`.github/workflows/release.yml` and `release-please-config.json` are the
-template: release-please opens a release PR from conventional commits, and npm
-publishing uses OIDC trusted publishing rather than a token. That setup needs
-two repository secrets, `GH_APP_ID` and `GH_APP_PRIVATE_KEY`.
+Commit type determines the version bump: `fix:` is a patch, `feat:` is a
+minor. While the package is pre-1.0, `feat!:`/`BREAKING CHANGE:` commits also
+bump minor rather than major, per `bump-minor-pre-major` in
+`release-please-config.json`.
 
 ## License
 
