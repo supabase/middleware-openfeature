@@ -93,7 +93,8 @@ try {
 // Needs no Vercel account.
 let resolveHandler: ((req: Request) => Promise<Response>) | null = null
 try {
-  const { withOpenFeature } = await import('@supabase/middleware-openfeature')
+  const { withOpenFeature } =
+    await import('@supabase-labs/middleware-openfeature')
   const stub = {
     getBooleanDetails: async (k: string, d: boolean) => ({
       flagKey: k,
@@ -121,7 +122,7 @@ try {
   probes.push({
     name: 'middleware-runs-in-edge-sandbox',
     question:
-      'Does @supabase/middleware-openfeature resolve flags in the edge sandbox?',
+      'Does @supabase-labs/middleware-openfeature resolve flags in the edge sandbox?',
     status:
       body.betaCheckout === true && body.theme === 'light' ? 'ok' : 'failed',
     detail: { status: res.status, body },
@@ -130,7 +131,7 @@ try {
   probes.push({
     name: 'middleware-runs-in-edge-sandbox',
     question:
-      'Does @supabase/middleware-openfeature resolve flags in the edge sandbox?',
+      'Does @supabase-labs/middleware-openfeature resolve flags in the edge sandbox?',
     status: 'failed',
     detail: String(error),
   })
@@ -227,7 +228,8 @@ if (providerReady && flagKey) {
 // Probe 7 — the same flag through the middleware, using the detected type.
 if (probed && probed.details?.reason !== 'ERROR' && flagKey) {
   try {
-    const { withOpenFeature } = await import('@supabase/middleware-openfeature')
+    const { withOpenFeature } =
+      await import('@supabase-labs/middleware-openfeature')
     const handler = withOpenFeature(
       { client: OpenFeature.getClient(), flags: { [flagKey]: probed.default } },
       async (_req: Request, ctx: any) => Response.json(ctx.flags),

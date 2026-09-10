@@ -1,6 +1,6 @@
 import { OpenFeature } from '@openfeature/server-sdk'
-import { withOpenFeature } from '@supabase/middleware-openfeature'
-import type { FlagClient } from '@supabase/middleware-openfeature'
+import { withOpenFeature } from '@supabase-labs/middleware-openfeature'
+import type { FlagClient } from '@supabase-labs/middleware-openfeature'
 
 // A real OpenFeature client satisfies the structural client with no adapter.
 const client: FlagClient = OpenFeature.getClient()

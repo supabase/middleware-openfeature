@@ -1,6 +1,6 @@
 import { OpenFeature } from '@openfeature/server-sdk'
 import { VercelProvider } from '@vercel/flags-core/openfeature'
-import type { FlagClient } from '@supabase/middleware-openfeature'
+import type { FlagClient } from '@supabase-labs/middleware-openfeature'
 
 /**
  * Build an OpenFeature client backed by Vercel Flags.

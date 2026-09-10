@@ -1,6 +1,6 @@
 import type { FetchHandler } from '@supabase/middleware'
-import { withOpenFeature } from '@supabase/middleware-openfeature'
-import type { FlagClient } from '@supabase/middleware-openfeature'
+import { withOpenFeature } from '@supabase-labs/middleware-openfeature'
+import type { FlagClient } from '@supabase-labs/middleware-openfeature'
 
 /**
  * PostHog flags are either boolean or multivariate. A **multivariate** flag

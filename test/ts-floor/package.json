@@ -8,7 +8,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/middleware-openfeature": "link:../..",
+    "@supabase-labs/middleware-openfeature": "link:../..",
     "@openfeature/server-sdk": "^1.23.0"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# TEMPORARY — remove once @supabase/middleware-openfeature is published to npm.
+# TEMPORARY — remove once @supabase-labs/middleware-openfeature is published to npm.
 #
 # The Vercel and Cloudflare examples cannot depend on the package by version yet,
 # and they cannot use `link:../../..` either: both platforms upload only the

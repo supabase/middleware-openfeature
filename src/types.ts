@@ -1,5 +1,5 @@
 /**
- * Public types for `@supabase/middleware-openfeature`.
+ * Public types for `@supabase-labs/middleware-openfeature`.
  *
  * The client is accepted **structurally**: `FlagClient` names the four methods
  * this middleware calls, so any OpenFeature server client satisfies it as-is

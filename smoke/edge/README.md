@@ -84,7 +84,7 @@ Test Files  1 passed (1)
     },
     {
       "name": "middleware-runs-in-edge-sandbox",
-      "question": "Does @supabase/middleware-openfeature resolve flags in the edge sandbox?",
+      "question": "Does @supabase-labs/middleware-openfeature resolve flags in the edge sandbox?",
       "status": "ok",
       "detail": {
         "status": 200,
