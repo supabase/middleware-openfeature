@@ -55,9 +55,9 @@
   },
   "devDependencies": {
     "@openfeature/server-sdk": "^1.23.0",
-    "@supabase/server": "1.6.0-beta.0",
+    "@supabase/server": "1.7.0",
     "prettier": "3.8.1",
-    "supabase": "^2.114.0",
+    "supabase": "^2.117.0",
     "tsdown": "^0.20.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"

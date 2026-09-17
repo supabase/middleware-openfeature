@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@supabase/server@1.7.0'
