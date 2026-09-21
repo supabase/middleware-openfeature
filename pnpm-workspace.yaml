@@ -1,2 +1,3 @@
 minimumReleaseAgeExclude:
   - '@supabase/server@1.7.0'
+  - '@supabase/middleware@0.6.0'
