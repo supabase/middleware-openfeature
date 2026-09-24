@@ -1,6 +1,6 @@
 {
   "name": "@supabase-labs/middleware-openfeature",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed OpenFeature flag resolution as a @supabase/middleware middleware. Resolves every declared flag per request and contributes the values at ctx.flags.",
   "keywords": [
     "middleware",
