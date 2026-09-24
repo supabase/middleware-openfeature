@@ -209,8 +209,7 @@ pnpm build
 
 This package was built from scratch against
 [`docs/authoring-guide.md`](https://github.com/supabase/middleware/blob/main/docs/authoring-guide.md)
-as a dogfooding exercise. Every place the guide fell short is recorded in
-[`docs/authoring-guide-friction.md`](./docs/authoring-guide-friction.md).
+as a dogfooding exercise.
 
 ## Releases
 
