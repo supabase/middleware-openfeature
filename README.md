@@ -207,10 +207,6 @@ pnpm test
 pnpm build
 ```
 
-This package was built from scratch against
-[`docs/authoring-guide.md`](https://github.com/supabase/middleware/blob/main/docs/authoring-guide.md)
-as a dogfooding exercise.
-
 ## Releases
 
 Releases are automated with [release-please](https://github.com/googleapis/release-please).
