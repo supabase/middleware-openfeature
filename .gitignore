@@ -6,9 +6,6 @@ dist/
 .env.*
 !.env.example
 
-# Internal process artifacts: the implementation plan, the spec mirror, and the
-# Linear comment/issue drafts. Deliverable docs live directly under docs/ and
-# are tracked — see docs/authoring-guide-friction.md and
 # docs/deno-vercel-findings.md.
 docs/superpowers/
 
