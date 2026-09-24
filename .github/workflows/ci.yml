@@ -103,10 +103,16 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # `supabase start` boots the function at container startup, so the
+      # vendored package it imports has to exist before the stack starts, not
+      # after — `_vendor/` is gitignored and doesn't survive a fresh checkout.
+      - name: Build and vendor the package into the smoke function
+        run: pnpm smoke:edge:vendor
+
       - name: Start the local stack (gateway + edge runtime only)
         run: supabase start --workdir smoke/edge
 
-      - run: pnpm smoke:edge
+      - run: pnpm exec vitest run --config smoke/edge/vitest.config.ts
 
       - name: Stop the local stack
         if: always()
