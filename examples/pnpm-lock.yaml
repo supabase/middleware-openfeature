@@ -14,15 +14,15 @@ importers:
       '@posthog/openfeature-node-provider':
         specifier: ^0.1.0
         version: 0.1.0(@openfeature/core@1.12.0)(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))(posthog-node@5.49.0)
-      '@supabase/middleware':
-        specifier: ^0.5.0
-        version: 0.5.0(typescript@5.9.3)
       '@supabase-labs/middleware-openfeature':
         specifier: link:..
         version: link:..
+      '@supabase/middleware':
+        specifier: ^1.0.0
+        version: 1.0.0(typescript@5.9.3)
       '@supabase/server':
-        specifier: 1.6.0-beta.0
-        version: 1.6.0-beta.0(@supabase/supabase-js@2.112.3)(typescript@5.9.3)
+        specifier: ^1.9.0
+        version: 1.9.0(@supabase/supabase-js@2.112.3)(typescript@5.9.3)
       '@vercel/flags-core':
         specifier: ^1.7.1
         version: 1.7.1(@openfeature/server-sdk@1.18.0(@openfeature/core@1.12.0))
@@ -67,8 +67,8 @@ packages:
     resolution: {integrity: sha512-gfv481mTOVWtZIJgXupxZpni2V2UWPf6jeF/jOK7HdMHdH+mt6sU0sHHwf0POsPip8ltlulu9OUHgwVzl5ddRw==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/middleware@0.5.0':
-    resolution: {integrity: sha512-OjukUo+5p14zxTuylf2zVg1hZCHWKLO6VrZhtVeQQw09yrVo3GAduvFJPiFDhTAz/Du1ZfEzAR+s6aRAWD5wzQ==}
+  '@supabase/middleware@1.0.0':
+    resolution: {integrity: sha512-ecA+z/o5E9sB+quuupGt8d7QjrnD4BBwZr+Qthm0uj6CtL/+yvAUTDlknhGuTbUidvx5CxBHJ1R3H96UjDpgyg==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: '>=5.4'
@@ -87,8 +87,8 @@ packages:
     resolution: {integrity: sha512-E6wljXWs7DUOloyIB69i3YFInWE6IyCvgTAbQ0KYxOHv26FdA1KzEXTuzxrYEdf70t406Z9BRwUlGyclGF2FXA==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/server@1.6.0-beta.0':
-    resolution: {integrity: sha512-OE0t4VYMS64aScTpi1+1kY2rb4X2Rn3eijOh/YpesqT6qzAWGbH2vpSja/kTHosGjVZ5wHdwg7FEX9pi+E8lHw==}
+  '@supabase/server@1.9.0':
+    resolution: {integrity: sha512-EhgfKFWjB6bCWy2UR2JdExnK+B8WBdwiG90+bLTt0GkdAuHZZSooNxOsn/fP3UlcXUNJ6xfAkYlvGzN8NUpz1w==}
     engines: {node: '>=22'}
     peerDependencies:
       '@nestjs/common': ^10.0.0 || ^11.0.0
@@ -302,7 +302,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/middleware@0.5.0(typescript@5.9.3)':
+  '@supabase/middleware@1.0.0(typescript@5.9.3)':
     dependencies:
       std-env: 4.2.0
     optionalDependencies:
@@ -319,9 +319,9 @@ snapshots:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/server@1.6.0-beta.0(@supabase/supabase-js@2.112.3)(typescript@5.9.3)':
+  '@supabase/server@1.9.0(@supabase/supabase-js@2.112.3)(typescript@5.9.3)':
     dependencies:
-      '@supabase/middleware': 0.5.0(typescript@5.9.3)
+      '@supabase/middleware': 1.0.0(typescript@5.9.3)
       '@supabase/supabase-js': 2.112.3
       jose: 6.2.8
     transitivePeerDependencies:
