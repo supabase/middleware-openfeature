@@ -49,6 +49,16 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
+      # OIDC trusted publishing needs npm 11.5.1 or newer; Node 22 bundles npm 10.
+      - name: Install latest npm
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          mkdir -p "$HOME/.npm-global"
+          npm config set prefix "$HOME/.npm-global"
+          echo "$HOME/.npm-global/bin" >> "$GITHUB_PATH"
+          npm install -g npm@latest
+          npm --version
+
       - name: Install dependencies
         if: ${{ steps.release.outputs.release_created }}
         run: pnpm install --frozen-lockfile

@@ -38,27 +38,27 @@
   "packageManager": "pnpm@11.9.0",
   "scripts": {
     "build": "tsdown",
-    "smoke:deno": "pnpm build && deno run --env-file=smoke/.env --allow-env --allow-net --allow-read --allow-sys --allow-ffi --config smoke/deno/deno.json smoke/deno/main.ts",
+    "smoke:deno": "pnpm build && deno run --minimum-dependency-age=0 --env-file=smoke/.env --allow-env --allow-net --allow-read --allow-sys --allow-ffi --config smoke/deno/deno.json smoke/deno/main.ts",
     "smoke:edge:vendor": "pnpm build && bash smoke/edge/vendor.sh",
     "smoke:edge": "pnpm smoke:edge:vendor && vitest run --config smoke/edge/vitest.config.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "typecheck:negative": "node scripts/check-negative-types.mjs",
     "typecheck:consumer": "pnpm --dir test/ts-floor install --ignore-workspace && pnpm --dir test/ts-floor exec tsc --noEmit",
-    "typecheck:examples": "pnpm --dir examples install --ignore-workspace && pnpm --dir examples exec tsc --noEmit",
+    "typecheck:examples": "pnpm --dir examples install --ignore-workspace --config.minimum-release-age-exclude=@supabase/middleware --config.minimum-release-age-exclude=@supabase/server && pnpm --dir examples exec tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
     "@openfeature/core": "^1.12.0",
-    "@supabase/middleware": "^0.6.0"
+    "@supabase/middleware": "^1.0.0"
   },
   "devDependencies": {
     "@openfeature/server-sdk": "^1.23.0",
-    "@supabase/server": "1.7.0",
-    "prettier": "3.8.1",
-    "supabase": "^2.117.0",
-    "tsdown": "^0.20.3",
+    "@supabase/server": "1.9.0",
+    "prettier": "3.9.9",
+    "supabase": "^2.118.0",
+    "tsdown": "^0.23.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
