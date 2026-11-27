@@ -93,12 +93,14 @@ export type Widen<T> = T extends boolean
 export type Resolved<F extends FlagDefaults> = { [K in keyof F]: Widen<F[K]> }
 
 /**
- * Per-instance configuration for `withOpenFeature`.
+ * Configuration for `createWithOpenFeature`, and for the deprecated
+ * `withOpenFeature`.
  *
  * @typeParam F - The declared flags and their defaults.
- * @typeParam Base - The accumulated upstream context, so `context`'s callback
- *   can read keys earlier middleware contributed. In the `pipeline` form this
- *   needs a one-line param annotation — see the package README.
+ * @typeParam Base - The upstream context `context`'s callback reads. For
+ *   `createWithOpenFeature` it is the type the callback's `ctx` parameter
+ *   declares, and its keys become the middleware's prerequisites. For
+ *   `withOpenFeature` it is the accumulated upstream in the nested form.
  */
 export interface WithOpenFeatureConfig<F extends FlagDefaults, Base> {
   /** The OpenFeature client (or any four-method stand-in) to resolve against. */

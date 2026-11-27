@@ -208,3 +208,104 @@ pipeline(
   async (_req, ctx) =>
     Response.json({ beta: ctx.flags.beta, sub: ctx.jwtClaims?.sub }),
 ) satisfies FetchHandler
+
+import type { Middleware } from '@supabase/middleware'
+
+import { createWithOpenFeature } from '../src/index.js'
+
+// `createWithOpenFeature` cases. The `ctx` type the `context` callback declares
+// is the middleware's prerequisite, so `withClaims` must run first.
+const withFlags = createWithOpenFeature({
+  client,
+  flags: { betaCheckout: false, theme: 'light', maxItems: 10 },
+  context: (_r, ctx: { jwtClaims: JWTClaims | null }) => ({
+    targetingKey: ctx.jwtClaims?.sub ?? 'anon',
+  }),
+})
+
+// F1 — nested: the provider discharges the prerequisite, and the handler sees
+// its key and `ctx.flags`, each flag widened from its default.
+withClaims(
+  withFlags(async (_req, ctx) => {
+    const _b: boolean = ctx.flags.betaCheckout
+    const _t: string = ctx.flags.theme
+    const _n: number = ctx.flags.maxItems
+    const _s: string | undefined = ctx.jwtClaims?.sub
+    return Response.json({ _b, _t, _n, _s })
+  }),
+) satisfies FetchHandler
+
+// F2 — pipeline: the same middleware as an entry, nothing annotated at the call.
+pipeline([withClaims(), withFlags()], async (_req, ctx) => {
+  const _b: boolean = ctx.flags.betaCheckout
+  const _t: string = ctx.flags.theme
+  const _n: number = ctx.flags.maxItems
+  const _s: string | undefined = ctx.jwtClaims?.sub
+  return Response.json({ _b, _t, _n, _s })
+}) satisfies FetchHandler
+
+// F3 — the factory returns the engine's own type, exactly.
+type Equals<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false
+const _f3: Equals<
+  typeof withFlags,
+  Middleware<
+    'flags',
+    void,
+    { jwtClaims: JWTClaims | null },
+    Resolved<{ betaCheckout: false; theme: 'light'; maxItems: 10 }>
+  >
+> = true
+void _f3
+
+// F4 — with no `context`, or one that reads only the request, there is no
+// prerequisite and the middleware stands alone in both forms.
+const withPlainFlags = createWithOpenFeature({ client, flags: { a: false } })
+withPlainFlags(async (_req, ctx) =>
+  Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
+pipeline([withPlainFlags()], async (_req, ctx) =>
+  Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
+
+const withRequestFlags = createWithOpenFeature({
+  client,
+  flags: { a: false },
+  context: (req) => ({ targetingKey: req.headers.get('x-user') ?? 'anon' }),
+})
+withRequestFlags(async (_req, ctx) =>
+  Response.json({ a: ctx.flags.a }),
+) satisfies FetchHandler
+
+// FS1 — `withSupabase` provides the keys the callback declares, as a `pipeline`
+// entry and as the outer layer.
+const withServerFlags = createWithOpenFeature({
+  client,
+  flags: { beta: false },
+  context: (
+    _r,
+    ctx: { jwtClaims: ServerClaims | null; authMode: AuthMode },
+  ) => ({ targetingKey: ctx.jwtClaims?.sub ?? ctx.authMode }),
+})
+
+pipeline(
+  [withSupabase({ auth: 'user', env: serverEnv }), withServerFlags()],
+  async (_req, ctx) => {
+    const _b: boolean = ctx.flags.beta
+    const _m: AuthMode = ctx.authMode
+    void ctx.supabase.from
+    return Response.json({ _b, _m })
+  },
+) satisfies FetchHandler
+
+withSupabase(
+  { auth: 'user', env: serverEnv },
+  withServerFlags(async (_req, ctx) => {
+    const _b: boolean = ctx.flags.beta
+    const _m: AuthMode = ctx.authMode
+    void ctx.supabase.from
+    return Response.json({ _b, _m })
+  }),
+) satisfies FetchHandler

@@ -16,6 +16,7 @@ import type {
   SingleKeyEntry,
 } from '@supabase/middleware'
 
+import type { createWithOpenFeature } from './create-with-open-feature.js'
 import { withOpenFeatureRuntime } from './with-open-feature.js'
 import type { FlagDefaults, Resolved, WithOpenFeatureConfig } from './types.js'
 
@@ -62,6 +63,9 @@ import type { FlagDefaults, Resolved, WithOpenFeatureConfig } from './types.js'
  *   async (_req, ctx) => Response.json({ beta: ctx.flags.betaCheckout }),
  * )
  * ```
+ *
+ * @deprecated Use {@link createWithOpenFeature}, which returns the engine's own
+ * `Middleware` type. This hand-written signature is removed at the next major.
  */
 export interface WithOpenFeature {
   // Handler call. `Base` flows *inward* from the contextual type of this call's
@@ -132,6 +136,9 @@ export interface WithOpenFeature {
  * two agree by construction — the runtime contributes `Record<string, FlagValue>`
  * under the key `flags`, and `Resolved<F>` is exactly that record narrowed to
  * the declared keys.
+ *
+ * @deprecated Use {@link createWithOpenFeature}, which returns the engine's own
+ * `Middleware` type. `withOpenFeature` is removed at the next major.
  */
 export const withOpenFeature: WithOpenFeature =
   withOpenFeatureRuntime as unknown as WithOpenFeature

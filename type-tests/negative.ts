@@ -140,3 +140,62 @@ withSupabase(
     async (_req, ctx) => Response.json({ a: ctx.flags.a }),
   ),
 ) satisfies FetchHandler
+
+import { createWithOpenFeature } from '../src/index.js'
+import type { JWTClaims } from './fixtures.js'
+
+// `createWithOpenFeature` cases. The callback's declared `ctx` is the
+// middleware's prerequisite, so a stack with no provider for it must not
+// compile in either form.
+const withFlags = createWithOpenFeature({
+  client,
+  flags: { a: false },
+  context: (_r, ctx: { jwtClaims: JWTClaims | null }) => ({
+    targetingKey: ctx.jwtClaims?.sub ?? 'anon',
+  }),
+})
+const withPlainFlags = createWithOpenFeature({ client, flags: { b: false } })
+
+// FN1 — nested with no provider: the produced handler still requires
+// `jwtClaims`, so it is not a `FetchHandler`.
+// @expect-error TS1360 is not assignable to type '{ jwtClaims: JWTClaims | null; }'
+withFlags(async (_req, ctx) => Response.json(ctx.flags)) satisfies FetchHandler
+
+// FN2 — pipeline with no provider.
+// @expect-error TS2345 middleware-prereq: key 'jwtClaims' is not yet on the context
+pipeline([withFlags()], async () => new Response()) satisfies FetchHandler
+
+// FN3 — pipeline with the provider after the entry that needs it.
+// @expect-error TS2345 middleware-prereq: key 'jwtClaims' is not yet on the context
+pipeline(
+  [withFlags(), withClaims()],
+  async () => new Response(),
+) satisfies FetchHandler
+
+// FN4 — an unannotated callback declares no keys, so reading one fails at the
+// callback rather than becoming an unchecked read.
+// @expect-error TS2339 Property 'jwtClaims' does not exist on type 'Record<never, never>'
+createWithOpenFeature({
+  client,
+  flags: { a: false },
+  context: (_r, ctx) => ({ targetingKey: ctx.jwtClaims?.sub }),
+})
+
+// FN5 — a collision on `flags`, nested.
+// @expect-error TS2769 middleware-conflict: key 'flags' is already present on the upstream context
+withPlainFlags(
+  withPlainFlags(async () => new Response()),
+) satisfies FetchHandler
+
+// FN6 — a collision on `flags`, in a pipeline.
+// @expect-error TS2345 middleware-conflict: key 'flags' is already present on the upstream context
+pipeline(
+  [withPlainFlags(), withPlainFlags()],
+  async () => new Response(),
+) satisfies FetchHandler
+
+// FN7 — `ctx.flags` is typed from `flags`, not `any`.
+// @expect-error TS2339 Property 'nope' does not exist on type 'Resolved<{ b: false; }>'
+withPlainFlags(async (_req, ctx) =>
+  Response.json(ctx.flags.nope),
+) satisfies FetchHandler

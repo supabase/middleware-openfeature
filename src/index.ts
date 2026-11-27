@@ -9,14 +9,16 @@
  * @example
  * ```ts
  * import { OpenFeature } from '@openfeature/server-sdk'
- * import { withOpenFeature } from '@supabase-labs/middleware-openfeature'
+ * import { createWithOpenFeature } from '@supabase-labs/middleware-openfeature'
  *
- * const client = OpenFeature.getClient()
+ * const withFlags = createWithOpenFeature({
+ *   client: OpenFeature.getClient(),
+ *   flags: { betaCheckout: false, theme: 'light' },
+ * })
  *
  * export default {
- *   fetch: withOpenFeature(
- *     { client, flags: { betaCheckout: false, theme: 'light' } },
- *     async (_req, ctx) => Response.json({ beta: ctx.flags.betaCheckout }),
+ *   fetch: withFlags(async (_req, ctx) =>
+ *     Response.json({ beta: ctx.flags.betaCheckout }),
  *   ),
  * }
  * ```
@@ -24,6 +26,7 @@
  * @packageDocumentation
  */
 
+export { createWithOpenFeature } from './create-with-open-feature.js'
 export { withOpenFeature } from './with-open-feature-types.js'
 export type { WithOpenFeature } from './with-open-feature-types.js'
 export type {

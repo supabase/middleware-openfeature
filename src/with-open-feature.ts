@@ -1,12 +1,11 @@
 /**
- * The `withOpenFeature` runtime.
+ * The flag resolution both exports run, and the `withOpenFeature` runtime.
  *
  * Implemented with `defineMiddleware`, so it inherits context seeding, request
  * buffering, contribution extraction and platform-arg detection from the
- * engine. Its published *types* are a bespoke overload set — see
- * `./with-open-feature-types.ts` — because `defineMiddleware`'s `Middleware`
- * does not expose the accumulated-upstream generic that `config.context`'s
- * callback needs.
+ * engine. `withOpenFeature`'s published *types* are a bespoke overload set —
+ * see `./with-open-feature-types.ts`. `createWithOpenFeature` publishes the
+ * engine's own `Middleware` type instead.
  *
  * @packageDocumentation
  */
@@ -19,6 +18,7 @@ import type { EvaluationContext, FlagValue, JsonValue } from '@openfeature/core'
 import type {
   FlagClient,
   FlagDefaults,
+  Resolved,
   WithOpenFeatureConfig,
 } from './types.js'
 
@@ -70,6 +70,40 @@ async function resolveFlag(
 }
 
 /**
+ * Resolve every declared flag for one request. This is the `run` body of both
+ * exports: `withOpenFeature` receives its config per call, and
+ * `createWithOpenFeature` closes over the config it was built with.
+ */
+export function resolveFlags<F extends FlagDefaults, Ctx>(
+  config: WithOpenFeatureConfig<F, Ctx>,
+) {
+  return async (req: Request, ctx: Ctx): Promise<{ flags: Resolved<F> }> => {
+    const evaluationContext = config.context?.(req, ctx)
+
+    // Resolve concurrently: one round trip's latency for the whole set rather
+    // than the sum.
+    const resolved = await Promise.all(
+      Object.entries(config.flags).map(
+        async ([flagKey, defaultValue]) =>
+          [
+            flagKey,
+            await resolveFlag(
+              config.client,
+              flagKey,
+              defaultValue,
+              evaluationContext,
+            ),
+          ] as const,
+      ),
+    )
+
+    // `resolveFlag` dispatches on each default's runtime type, so every value
+    // has the type `Resolved<F>` widens that default to.
+    return { flags: Object.fromEntries(resolved) as Resolved<F> }
+  }
+}
+
+/**
  * The raw `defineMiddleware` result. Exported for the type layer to re-publish
  * under the bespoke signature; consumers import `withOpenFeature` instead.
  */
@@ -91,26 +125,5 @@ export const withOpenFeatureRuntime: Middleware<
   Record<string, FlagValue>
 >({
   key: 'flags',
-  run: (config) => async (req, ctx) => {
-    const evaluationContext = config.context?.(req, ctx)
-
-    // Resolve concurrently: one round trip's latency for the whole set rather
-    // than the sum.
-    const resolved = await Promise.all(
-      Object.entries(config.flags).map(
-        async ([flagKey, defaultValue]) =>
-          [
-            flagKey,
-            await resolveFlag(
-              config.client,
-              flagKey,
-              defaultValue,
-              evaluationContext,
-            ),
-          ] as const,
-      ),
-    )
-
-    return { flags: Object.fromEntries(resolved) }
-  },
+  run: (config) => resolveFlags(config),
 })

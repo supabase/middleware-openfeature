@@ -36,7 +36,7 @@ jobs:
       - run: pnpm build
 
       - name: Smoke-test the built entrypoint loads in raw Node
-        run: node --input-type=module -e "import('./dist/index.js').then(m => { if (typeof m.withOpenFeature !== 'function') { throw new Error('withOpenFeature missing from dist') } })"
+        run: node --input-type=module -e "import('./dist/index.js').then(m => { for (const name of ['createWithOpenFeature', 'withOpenFeature']) { if (typeof m[name] !== 'function') { throw new Error(name + ' missing from dist') } } })"
 
       # The floor is TypeScript 5.4 (`NoInfer`), pinned in test/ts-floor. This
       # package emits `NoInfer` into its published .d.ts, so it inherits the
