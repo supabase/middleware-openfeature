@@ -9,22 +9,26 @@ client, and every declared flag is resolved concurrently per request and lands a
 
 ```ts
 import { OpenFeature } from '@openfeature/server-sdk'
-import { withOpenFeature } from '@supabase-labs/middleware-openfeature'
+import { createWithOpenFeature } from '@supabase-labs/middleware-openfeature'
 
-const client = OpenFeature.getClient()
+const withFlags = createWithOpenFeature({
+  client: OpenFeature.getClient(),
+  flags: { betaCheckout: false, theme: 'light', maxItems: 10 },
+})
 
 export default {
-  fetch: withOpenFeature(
-    { client, flags: { betaCheckout: false, theme: 'light', maxItems: 10 } },
-    async (_req, ctx) => {
-      ctx.flags.betaCheckout // boolean
-      ctx.flags.theme // string
-      ctx.flags.maxItems // number
-      return Response.json(ctx.flags)
-    },
-  ),
+  fetch: withFlags(async (_req, ctx) => {
+    ctx.flags.betaCheckout // boolean
+    ctx.flags.theme // string
+    ctx.flags.maxItems // number
+    return Response.json(ctx.flags)
+  }),
 }
 ```
+
+`createWithOpenFeature` builds the middleware where the flags are known. The
+result is a plain `@supabase/middleware` middleware, called with no config:
+`withFlags(handler)` nested, or `withFlags()` as a `pipeline` entry.
 
 ## Install
 
@@ -67,8 +71,8 @@ you at runtime**:
 
 ```ts
 // `theme` is a STRING flag in the provider
-withOpenFeature({ client, flags: { theme: false } }, handler)
-//                                        ^^^^^ boolean
+createWithOpenFeature({ client, flags: { theme: false } })
+//                                      ^^^^^ boolean
 // ctx.flags.theme === false, with a 200 response and no error anywhere
 ```
 
@@ -105,58 +109,68 @@ for it, and contributes exactly one `ctx` key.
 ## Targeting
 
 `context` builds the OpenFeature evaluation context per request. It receives the
-`Request` and the accumulated upstream context, so a targeting key can come from
-an upstream auth middleware:
-
-```ts
-import { withClaims } from '@supabase/server'
-
-withClaims(
-  withOpenFeature(
-    {
-      client,
-      flags: { betaCheckout: false },
-      context: (_req, ctx) => ({ targetingKey: ctx.jwtClaims?.sub ?? 'anon' }),
-    },
-    async (_req, ctx) => Response.json({ beta: ctx.flags.betaCheckout }),
-  ),
-)
-```
-
-### With `pipeline`, a context callback that reads upstream needs one annotation
+`Request` and the upstream context, so a targeting key can come from an upstream
+auth middleware. Annotate the keys it reads: they become the middleware's
+prerequisites.
 
 ```ts
 import { pipeline } from '@supabase/middleware'
 import { withClaims } from '@supabase/server'
 import type { JWTClaims } from '@supabase/server'
 
-pipeline(
-  [
-    withClaims(),
-    withOpenFeature({
-      client,
-      flags: { betaCheckout: false },
-      //                                  ↓ this annotation is required
-      context: (_req, ctx: { jwtClaims: JWTClaims | null }) => ({
-        targetingKey: ctx.jwtClaims?.sub ?? 'anon',
-      }),
-    }),
-  ],
-  async (_req, ctx) => Response.json({ beta: ctx.flags.betaCheckout }),
+const withFlags = createWithOpenFeature({
+  client,
+  flags: { betaCheckout: false },
+  context: (_req, ctx: { jwtClaims: JWTClaims | null }) => ({
+    targetingKey: ctx.jwtClaims?.sub ?? 'anon',
+  }),
+})
+
+// nested
+withClaims(
+  withFlags(async (_req, ctx) =>
+    Response.json({ beta: ctx.flags.betaCheckout }),
+  ),
+)
+
+// pipeline
+pipeline([withClaims(), withFlags()], async (_req, ctx) =>
+  Response.json({ beta: ctx.flags.betaCheckout }),
 )
 ```
 
-**Why:** `withOpenFeature({…})` is a complete expression, so TypeScript checks it
-_before_ `pipeline` sees the array. Array-position information cannot flow
-backwards into an already-checked argument. It is inherent to evaluation order,
-not a defect.
+A stack with no provider for `jwtClaims` does not compile. `pipeline` names the
+key: `middleware-prereq: key 'jwtClaims' is not yet on the context`. Nested, the
+produced handler still requires `jwtClaims`, so it fails wherever a handler is
+expected: `satisfies FetchHandler`, a typed export, or `Deno.serve`.
 
-**What it does not affect:** composition, ordering, prerequisites, and handler
-typing all work normally under `pipeline` — the handler sees every upstream key
-and `ctx.flags` at full fidelity, with nothing annotated. And a `context`
-callback that ignores the upstream context needs no annotation either. At runtime
-the accumulated context is passed through in both forms, so only the static type
-differs.
+Every key in the annotation is a prerequisite, so annotate the keys the callback
+reads rather than a whole context type such as `SupabaseContext`. An unannotated
+`ctx` has no keys, so reading one fails at the callback. A callback that reads
+only the request adds no prerequisite.
+
+## `withOpenFeature` (deprecated)
+
+`withOpenFeature` takes its config at each call and publishes a hand-written
+signature. It is removed at the next major. Moving to `createWithOpenFeature`:
+
+```ts
+// withOpenFeature
+withClaims(withOpenFeature({ client, flags, context }, handler))
+pipeline([withClaims(), withOpenFeature({ client, flags, context })], handler)
+
+// createWithOpenFeature
+const withFlags = createWithOpenFeature({ client, flags, context })
+withClaims(withFlags(handler))
+pipeline([withClaims(), withFlags()], handler)
+```
+
+- The config moves from the middleware call to the factory.
+- Nested, `withOpenFeature` types the `context` callback's `ctx` from the
+  enclosing layers. `createWithOpenFeature` does not: annotate what the callback
+  reads, as the `pipeline` form of `withOpenFeature` already requires. The
+  annotation is then a checked prerequisite in both forms. In
+  `withOpenFeature`'s `pipeline` form, nothing checks it.
 
 ## Bring your own client
 
